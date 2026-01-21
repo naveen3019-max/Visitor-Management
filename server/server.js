@@ -15,6 +15,11 @@ const connectDB = require('./config/db');
 // Initialize app
 const app = express();
 
+// Trust proxy for Vercel/serverless deployment (required for rate limiting)
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', true);
+}
+
 // Disable caching for development
 app.use((req, res, next) => {
   res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
