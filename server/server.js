@@ -31,10 +31,14 @@ app.use((req, res, next) => {
 // Connect to MongoDB (async for serverless)
 connectDB().catch(err => console.error('MongoDB connection failed:', err));
 
-// Rate limiting
+// Rate limiting - only for local development (Vercel has built-in rate limiting)
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
+  max: 100, // limit each IP to 100 requests per windowMs
+  standardHeaders: true,
+  legacyHeaders: false,
+  // Skip rate limiting in production (Vercel handles this)
+  skip: () => process.env.NODE_ENV === 'production'
 });
 
 // Middleware
