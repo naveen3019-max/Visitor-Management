@@ -1,0 +1,9 @@
+node_modules
+.env
+.vercel
+*.log
+npm-debug.log*
+.DS_Store
+.vscode
+reports/*.pdf
+reports/*.csv

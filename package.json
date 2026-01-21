@@ -1,0 +1,42 @@
+{
+  "name": "visitor-management-pwa",
+  "version": "1.0.0",
+  "description": "Local-only Visitor Management PWA with MongoDB",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "nodemon server/server.js",
+    "build": "npx tailwindcss -i ./public/css/input.css -o ./public/css/styles.css --minify",
+    "build:css": "npx tailwindcss -i ./public/css/input.css -o ./public/css/styles.css --watch",
+    "vercel-build": "npx tailwindcss -i ./public/css/input.css -o ./public/css/styles.css --minify"
+  },
+  "keywords": [
+    "visitor",
+    "management",
+    "pwa",
+    "mongodb"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "csv-stringify": "^6.4.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^7.0.0",
+    "mongoose": "^8.0.3",
+    "pdfkit": "^0.14.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.16",
+    "nodemon": "^3.0.2",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.4.0"
+  }
+}
