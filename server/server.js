@@ -79,18 +79,21 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
-const PORT = process.env.PORT || 3000;
+// Export for Vercel
+module.exports = app;
 
-app.listen(PORT, () => {
-  console.log(`
+// Start server only when not in serverless environment
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  
+  app.listen(PORT, () => {
+    console.log(`
 ╔═══════════════════════════════════════════════════════════╗
 ║   🚀 Visitor Management System                            ║
 ║   📍 Server running on http://localhost:${PORT}           ║
 ║   🗄️  Database: ${process.env.MONGODB_URI}                ║
 ║   🌐 Environment: ${process.env.NODE_ENV || 'development'} ║
 ╚═══════════════════════════════════════════════════════════╝
-  `);
-});
-
-module.exports = app;
+    `);
+  });
+}
