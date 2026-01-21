@@ -1,9 +1,13 @@
 const { stringify } = require('csv-stringify/sync');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
-// Ensure reports directory exists
-const reportsDir = path.join(__dirname, '../../reports');
+// Use /tmp directory for serverless environments (Vercel), otherwise use local reports folder
+const reportsDir = process.env.NODE_ENV === 'production' 
+  ? path.join(os.tmpdir(), 'reports')
+  : path.join(__dirname, '../../reports');
+
 if (!fs.existsSync(reportsDir)) {
   fs.mkdirSync(reportsDir, { recursive: true });
 }
