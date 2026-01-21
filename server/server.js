@@ -19,8 +19,8 @@ app.use((req, res, next) => {
   next();
 });
 
-// Connect to MongoDB
-connectDB();
+// Connect to MongoDB (async for serverless)
+connectDB().catch(err => console.error('MongoDB connection failed:', err));
 
 // Rate limiting
 const limiter = rateLimit({
