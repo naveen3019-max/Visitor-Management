@@ -794,8 +794,11 @@ class App {
       <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
         <!-- Modern Sidebar + Header Layout -->
         <div class="flex h-screen overflow-hidden">
+          <!-- Mobile Sidebar Overlay -->
+          <div id="mobile-sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden lg:hidden"></div>
+          
           <!-- Sidebar -->
-          <aside class="hidden lg:flex lg:flex-col w-72 bg-gradient-to-b from-slate-900 to-slate-800 shadow-2xl">
+          <aside id="mobile-sidebar" class="fixed lg:static inset-y-0 left-0 z-50 w-72 bg-gradient-to-b from-slate-900 to-slate-800 shadow-2xl transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col">
             <!-- Logo/Brand -->
             <div class="flex items-center gap-3 px-6 py-6 border-b border-slate-700">
               <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
@@ -862,7 +865,7 @@ class App {
               <div class="flex items-center justify-between px-6 py-4">
                 <!-- Mobile Menu + Search -->
                 <div class="flex items-center gap-4 flex-1">
-                  <button class="lg:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg">
+                  <button id="mobile-menu-btn" class="lg:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                     </svg>
@@ -1006,6 +1009,19 @@ class App {
       this.stopNotificationPolling();
       this.renderLogin();
     });
+
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileSidebar = document.getElementById('mobile-sidebar');
+    const mobileSidebarOverlay = document.getElementById('mobile-sidebar-overlay');
+    
+    const toggleMobileMenu = () => {
+      mobileSidebar.classList.toggle('-translate-x-full');
+      mobileSidebarOverlay.classList.toggle('hidden');
+    };
+    
+    mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+    mobileSidebarOverlay.addEventListener('click', toggleMobileMenu);
 
     document.getElementById('visitor-requests-btn').addEventListener('click', () => this.renderVisitorRequests());
     document.getElementById('analytics-btn').addEventListener('click', () => this.renderAnalytics());
