@@ -533,28 +533,26 @@ class App {
       <div class="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
         <!-- Simple Header -->
         <header class="bg-white shadow-md border-b border-gray-200 sticky top-0 z-10">
-          <div class="w-full mx-auto px-2.5 sm:px-4 lg:px-8 py-2 sm:py-3">
-            <div class="flex items-center justify-between gap-1.5 sm:gap-2">
+          <div class="w-full px-2 sm:px-4 py-2 sm:py-3">
+            <div class="flex items-center justify-between gap-1 sm:gap-2">
               <!-- Left: Logo & Title -->
-              <div class="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1 overflow-hidden">
-                <div class="w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-md sm:rounded-lg flex items-center justify-center shadow-md flex-shrink-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" fill="white" viewBox="0 0 24 24">
+              <div class="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded flex items-center justify-center shadow-md flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" fill="white" viewBox="0 0 24 24">
                     <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 16h2v2h-2v-2zm0-10h2v8h-2V7z"/>
                   </svg>
                 </div>
-                <div class="min-w-0 flex-1 overflow-hidden">
-                  <h1 class="text-xs sm:text-sm md:text-base lg:text-lg font-bold text-gray-900 truncate leading-tight">Security Guard Portal</h1>
-                  <p class="text-[10px] sm:text-xs text-gray-600 truncate leading-tight">Visitor Management</p>
+                <div class="min-w-0 flex-1">
+                  <h1 class="text-[11px] sm:text-sm font-bold text-gray-900 truncate leading-none">Security Guard</h1>
+                  <p class="text-[9px] sm:text-xs text-gray-500 truncate leading-none mt-0.5">Visitor Portal</p>
                 </div>
               </div>
               
               <!-- Right: Logout -->
-              <div class="flex items-center flex-shrink-0">
-                <button id="logout-btn" class="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 bg-red-500 hover:bg-red-600 active:bg-red-700 text-white rounded-md sm:rounded-lg text-xs sm:text-sm font-medium transition-all shadow-sm touch-manipulation">
-                  <i class="bi bi-box-arrow-right text-white text-sm sm:text-base"></i>
-                  <span class="hidden xs:inline">Logout</span>
-                </button>
-              </div>
+              <button id="logout-btn" class="flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 bg-red-500 hover:bg-red-600 active:bg-red-700 text-white rounded text-[10px] sm:text-xs font-medium transition-all shadow-sm flex-shrink-0">
+                <i class="bi bi-box-arrow-right text-xs sm:text-sm"></i>
+                <span>Logout</span>
+              </button>
             </div>
           </div>
         </header>
