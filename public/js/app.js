@@ -925,7 +925,7 @@ class App {
           const visitorInitial = visitorName.charAt(0).toUpperCase();
           
           return `
-            <div class="bg-white border-2 ${isInside ? 'border-green-200' : 'border-gray-200'} rounded-lg sm:rounded-xl p-3 sm:p-5 hover:shadow-md transition-all duration-200">
+            <div class="bg-white border-2 border-gray-200 rounded-lg sm:rounded-xl p-3 sm:p-5 hover:shadow-md transition-all duration-200">
               <div class="flex items-start gap-2 sm:gap-4">
                 <!-- Photo or Avatar -->
                 ${visitor.photo ? `
@@ -938,7 +938,7 @@ class App {
                 
                 <!-- Content -->
                 <div class="flex-1 min-w-0 overflow-hidden">
-                  <div class="flex items-start justify-between gap-2 mb-2 sm:mb-3">
+                  <div class="mb-2 sm:mb-3">
                     <div class="flex-1 min-w-0">
                       <h3 class="font-bold text-gray-900 text-sm sm:text-lg mb-1 truncate">${visitorName}</h3>
                       <p class="text-xs sm:text-sm text-gray-600 flex items-center gap-1.5 sm:gap-2 mb-1 truncate">
@@ -952,10 +952,6 @@ class App {
                         </p>
                       ` : ''}
                     </div>
-                    <span class="${isInside ? 'bg-green-50 text-green-700 border-green-200' : 'bg-gray-50 text-gray-700 border-gray-200'} px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-bold border-2 flex items-center gap-1 sm:gap-1.5 whitespace-nowrap flex-shrink-0">
-                      <i class="bi ${isInside ? 'bi-door-open-fill' : 'bi-door-closed-fill'}"></i>
-                      ${isInside ? 'Inside' : 'Out'}
-                    </span>
                   </div>
                   
                   <div class="space-y-1.5 sm:space-y-2 text-xs sm:text-sm">
