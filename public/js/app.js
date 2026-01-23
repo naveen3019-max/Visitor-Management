@@ -826,20 +826,30 @@ class App {
           return `
             <div class="bg-white border-2 ${isInside ? 'border-green-200' : 'border-gray-200'} rounded-xl p-5 hover:shadow-md transition-all duration-200">
               <div class="flex items-start gap-4">
-                <!-- Avatar -->
-                <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm flex-shrink-0">
-                  ${visitorInitial}
-                </div>
+                <!-- Photo or Avatar -->
+                ${visitor.photo ? `
+                  <img src="${visitor.photo}" alt="${visitorName}" class="w-12 h-12 rounded-full object-cover shadow-sm flex-shrink-0">
+                ` : `
+                  <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm flex-shrink-0">
+                    ${visitorInitial}
+                  </div>
+                `}
                 
                 <!-- Content -->
                 <div class="flex-1 min-w-0">
                   <div class="flex items-start justify-between gap-3 mb-3">
                     <div class="flex-1">
                       <h3 class="font-bold text-gray-900 text-lg mb-1">${visitorName}</h3>
-                      <p class="text-sm text-gray-600 flex items-center gap-2">
+                      <p class="text-sm text-gray-600 flex items-center gap-2 mb-1">
                         <i class="bi bi-telephone-fill text-blue-600"></i>
                         ${visitor.contact || 'N/A'}
                       </p>
+                      ${visitor.email ? `
+                        <p class="text-sm text-gray-600 flex items-center gap-2">
+                          <i class="bi bi-envelope-fill text-purple-600"></i>
+                          ${visitor.email}
+                        </p>
+                      ` : ''}
                     </div>
                     <span class="${isInside ? 'bg-green-50 text-green-700 border-green-200' : 'bg-gray-50 text-gray-700 border-gray-200'} px-3 py-1.5 rounded-lg text-xs font-bold border-2 flex items-center gap-1.5 whitespace-nowrap">
                       <i class="bi ${isInside ? 'bi-door-open-fill' : 'bi-door-closed-fill'}"></i>
@@ -864,12 +874,6 @@ class App {
                       <span class="mx-1">•</span>
                       ${timeIn.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </div>
-                    ${visitor.timeOut ? `
-                      <div class="flex items-center gap-2 text-xs text-gray-500">
-                        <i class="bi bi-box-arrow-right text-red-600"></i>
-                        Checked out: ${new Date(visitor.timeOut).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
-                      </div>
-                    ` : ''}
                   </div>
                 </div>
               </div>
@@ -1241,19 +1245,22 @@ class App {
             
             return `
               <div class="flex items-start gap-3 p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
-                <div class="${colorClass} w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                  ${initials}
-                </div>
+                ${visitor.photo ? `
+                  <img src="${visitor.photo}" alt="${visitor.name}" class="w-10 h-10 rounded-full object-cover flex-shrink-0">
+                ` : `
+                  <div class="${colorClass} w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                    ${initials}
+                  </div>
+                `}
                 <div class="flex-1 min-w-0">
                   <div class="flex items-start justify-between gap-2">
                     <div class="flex-1 min-w-0">
                       <p class="text-sm font-semibold text-slate-800 truncate">${visitor.name}</p>
+                      ${visitor.email ? `
+                        <p class="text-xs text-slate-500 truncate">${visitor.email}</p>
+                      ` : ''}
                       <p class="text-xs text-slate-600 truncate">${visitor.purpose}</p>
                     </div>
-                    ${visitor.timeOut ? 
-                      '<span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full flex-shrink-0">Checked Out</span>' : 
-                      '<span class="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded-full flex-shrink-0">Inside</span>'
-                    }
                   </div>
                   <div class="flex items-center gap-3 mt-1 text-xs text-slate-500">
                     <span class="flex items-center gap-1">
@@ -1471,17 +1478,25 @@ class App {
                   <tr class="border-b border-gray-200">
                     <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Name</th>
                     <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Contact</th>
+                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Email</th>
                     <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Purpose</th>
                     <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Time In</th>
-                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Time Out</th>
                     <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Logged By</th>
                   </tr>
                 </thead>
                 <tbody>
                   ${periodVisitors.map(visitor => `
                     <tr class="border-b border-gray-100 hover:bg-gray-50">
-                      <td class="py-3 px-4 text-sm text-gray-900">${visitor.name || 'N/A'}</td>
+                      <td class="py-3 px-4 text-sm">
+                        <div class="flex items-center gap-2">
+                          ${visitor.photo ? `
+                            <img src="${visitor.photo}" alt="${visitor.name}" class="w-8 h-8 rounded-full object-cover">
+                          ` : ''}
+                          <span class="text-gray-900">${visitor.name || 'N/A'}</span>
+                        </div>
+                      </td>
                       <td class="py-3 px-4 text-sm text-gray-600">${visitor.contact || 'N/A'}</td>
+                      <td class="py-3 px-4 text-sm text-gray-600">${visitor.email || 'N/A'}</td>
                       <td class="py-3 px-4 text-sm text-gray-600">${visitor.purpose || 'N/A'}</td>
                       <td class="py-3 px-4 text-sm text-gray-600">${new Date(visitor.timeIn || visitor.createdAt).toLocaleString('en-US', { 
                         month: 'short', 
@@ -1489,17 +1504,6 @@ class App {
                         hour: '2-digit',
                         minute: '2-digit'
                       })}</td>
-                      <td class="py-3 px-4 text-sm">
-                        ${visitor.timeOut ? 
-                          `<span class="text-gray-600">${new Date(visitor.timeOut).toLocaleString('en-US', { 
-                            month: 'short', 
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}</span>` :
-                          '<span class="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">Inside</span>'
-                        }
-                      </td>
                       <td class="py-3 px-4 text-sm text-gray-600">${visitor.guardId?.name || 'N/A'}</td>
                     </tr>
                   `).join('')}
@@ -1920,10 +1924,10 @@ class App {
                 <tr>
                   <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Name</th>
                   <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Contact</th>
+                  <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Email</th>
                   <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Purpose</th>
                   <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Person to Meet</th>
                   <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Time In</th>
-                  <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Time Out</th>
                   <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Logged By</th>
                 </tr>
               </thead>
@@ -1932,13 +1936,18 @@ class App {
                   <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}">
                     <td class="py-3 px-4">
                       <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
-                          <span class="text-indigo-600 font-bold text-sm">${visitor.name?.charAt(0) || '?'}</span>
-                        </div>
+                        ${visitor.photo ? `
+                          <img src="${visitor.photo}" alt="${visitor.name}" class="w-10 h-10 rounded-full object-cover flex-shrink-0">
+                        ` : `
+                          <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <span class="text-indigo-600 font-bold text-sm">${visitor.name?.charAt(0) || '?'}</span>
+                          </div>
+                        `}
                         <span class="text-sm font-medium text-gray-900">${visitor.name || 'N/A'}</span>
                       </div>
                     </td>
                     <td class="py-3 px-4 text-sm text-gray-600">${visitor.contact || 'N/A'}</td>
+                    <td class="py-3 px-4 text-sm text-gray-600">${visitor.email || 'N/A'}</td>
                     <td class="py-3 px-4 text-sm text-gray-600">${visitor.purpose || 'N/A'}</td>
                     <td class="py-3 px-4 text-sm text-gray-600">${visitor.personToMeet || 'N/A'}</td>
                     <td class="py-3 px-4 text-sm text-gray-600">
@@ -1949,17 +1958,6 @@ class App {
                         hour: '2-digit',
                         minute: '2-digit'
                       })}
-                    </td>
-                    <td class="py-3 px-4 text-sm text-gray-600">
-                      ${visitor.timeOut 
-                        ? new Date(visitor.timeOut).toLocaleString('en-US', { 
-                            month: 'short', 
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })
-                        : '<span class="inline-flex px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">Inside</span>'
-                      }
                     </td>
                     <td class="py-3 px-4 text-sm text-gray-600">${visitor.guardId?.fullName || visitor.guardId?.username || 'Unknown'}</td>
                   </tr>
