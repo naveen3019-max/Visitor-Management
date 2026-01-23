@@ -11,6 +11,16 @@ const visitorSchema = new mongoose.Schema({
     required: [true, 'Contact number is required'],
     trim: true
   },
+  email: {
+    type: String,
+    required: [true, 'Email address is required'],
+    trim: true,
+    lowercase: true
+  },
+  photo: {
+    type: String,
+    required: [true, 'Visitor photo is required']
+  },
   memberId: {
     type: String,
     default: null,

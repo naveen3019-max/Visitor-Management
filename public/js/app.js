@@ -566,6 +566,17 @@ class App {
                     placeholder="Enter contact number">
                 </div>
 
+                <!-- Email Address -->
+                <div>
+                  <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+                    <i class="bi bi-envelope-fill text-gray-600 text-lg"></i>
+                    Email Address <span class="text-red-500">*</span>
+                  </label>
+                  <input type="email" name="email" required
+                    class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none"
+                    placeholder="Enter email address">
+                </div>
+
                 <!-- Reason for Visit -->
                 <div>
                   <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
@@ -586,6 +597,43 @@ class App {
                   <input type="text" name="personToMeet"
                     class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none"
                     placeholder="Name of person to meet">
+                </div>
+
+                <!-- Visitor Photo -->
+                <div>
+                  <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+                    <i class="bi bi-camera-fill text-gray-600 text-lg"></i>
+                    Visitor Photo <span class="text-red-500">*</span>
+                  </label>
+                  <div class="space-y-3">
+                    <!-- Photo Preview -->
+                    <div id="photo-preview" class="hidden">
+                      <div class="relative inline-block">
+                        <img id="preview-image" class="w-32 h-32 object-cover rounded-lg border-2 border-gray-300" alt="Preview">
+                        <button type="button" id="remove-photo" class="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-md transition-all">
+                          <i class="bi bi-x-lg text-sm"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <!-- Photo Input Buttons -->
+                    <div id="photo-inputs" class="flex gap-2">
+                      <label class="flex-1 cursor-pointer">
+                        <div class="flex items-center justify-center gap-2 px-4 py-3 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-300 rounded-lg transition-all">
+                          <i class="bi bi-camera text-lg"></i>
+                          <span class="text-sm font-medium">Take Photo</span>
+                        </div>
+                        <input type="file" id="camera-input" accept="image/*" capture="user" class="hidden">
+                      </label>
+                      <label class="flex-1 cursor-pointer">
+                        <div class="flex items-center justify-center gap-2 px-4 py-3 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-300 rounded-lg transition-all">
+                          <i class="bi bi-upload text-lg"></i>
+                          <span class="text-sm font-medium">Upload Photo</span>
+                        </div>
+                        <input type="file" id="upload-input" accept="image/*" class="hidden">
+                      </label>
+                    </div>
+                  </div>
+                  <input type="hidden" name="photo" id="photo-data">
                 </div>
 
                 <!-- Submit Button -->
@@ -646,6 +694,46 @@ class App {
       });
     }
 
+    // Photo upload handlers
+    const cameraInput = document.getElementById('camera-input');
+    const uploadInput = document.getElementById('upload-input');
+    const photoPreview = document.getElementById('photo-preview');
+    const previewImage = document.getElementById('preview-image');
+    const photoInputs = document.getElementById('photo-inputs');
+    const removePhotoBtn = document.getElementById('remove-photo');
+    const photoData = document.getElementById('photo-data');
+
+    const handlePhotoSelect = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        if (file.size > 5 * 1024 * 1024) { // 5MB limit
+          this.showToast('Photo size must be less than 5MB', 'error');
+          return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          previewImage.src = event.target.result;
+          photoData.value = event.target.result;
+          photoPreview.classList.remove('hidden');
+          photoInputs.classList.add('hidden');
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+
+    cameraInput.addEventListener('change', handlePhotoSelect);
+    uploadInput.addEventListener('change', handlePhotoSelect);
+
+    removePhotoBtn.addEventListener('click', () => {
+      photoData.value = '';
+      previewImage.src = '';
+      cameraInput.value = '';
+      uploadInput.value = '';
+      photoPreview.classList.add('hidden');
+      photoInputs.classList.remove('hidden');
+    });
+
     // Visitor form submission
     document.getElementById('visitor-form').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -654,20 +742,29 @@ class App {
       // Get values and trim whitespace
       const name = (formData.get('name') || '').trim();
       const phone = (formData.get('phone') || '').trim();
+      const email = (formData.get('email') || '').trim();
       const purpose = (formData.get('purpose') || '').trim();
       const personToMeet = (formData.get('personToMeet') || '').trim();
+      const photo = formData.get('photo') || '';
       
       // Client-side validation
-      if (!name || !phone || !purpose) {
+      if (!name || !phone || !email || !purpose) {
         this.showToast('Please fill in all required fields', 'error');
+        return;
+      }
+      
+      if (!photo) {
+        this.showToast('Please take or upload a photo of the visitor', 'error');
         return;
       }
       
       const data = {
         name: name,
         contact: phone,
+        email: email,
         purpose: purpose,
-        personToMeet: personToMeet || 'N/A'
+        personToMeet: personToMeet || 'N/A',
+        photo: photo
       };
       
       console.log('Submitting visitor data:', data);
@@ -676,6 +773,13 @@ class App {
         await api.logVisitor(data);
         this.showToast('Visitor logged successfully!', 'success');
         e.target.reset();
+        // Reset photo preview
+        photoData.value = '';
+        previewImage.src = '';
+        cameraInput.value = '';
+        uploadInput.value = '';
+        photoPreview.classList.add('hidden');
+        photoInputs.classList.remove('hidden');
         // Reload visitors list
         this.loadGuardVisitors();
       } catch (error) {
