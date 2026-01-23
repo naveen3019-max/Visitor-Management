@@ -530,7 +530,7 @@ class App {
   async renderGuardDashboard() {
     const app = document.getElementById('app');
     app.innerHTML = `
-      <div class="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
+      <div class="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 overflow-x-hidden">
         <!-- Simple Header -->
         <header class="bg-white shadow-md border-b border-gray-200 sticky top-0 z-10">
           <div class="w-full px-2 sm:px-4 py-2 sm:py-3">
@@ -558,7 +558,7 @@ class App {
         </header>
 
         <!-- Main Content -->
-        <main class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
+        <main class="w-full max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
           <div class="grid lg:grid-cols-2 gap-4 sm:gap-6">
             <!-- Left: Visitor Entry Form -->
             <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 sm:p-6 lg:p-8 h-fit"
