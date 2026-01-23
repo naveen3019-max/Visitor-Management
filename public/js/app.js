@@ -558,10 +558,10 @@ class App {
         </header>
 
         <!-- Main Content -->
-        <main class="w-full max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
-          <div class="grid lg:grid-cols-2 gap-4 sm:gap-6">
+        <main class="w-full mx-auto px-2 sm:px-3 lg:px-8 py-3 sm:py-4 lg:py-8">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             <!-- Left: Visitor Entry Form -->
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 sm:p-6 lg:p-8 h-fit"
+            <div class="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-200 p-3 sm:p-4 lg:p-8 w-full">
               <!-- Form Header -->
               <div class="mb-6">
                 <div class="flex items-center gap-3 mb-2">
@@ -680,7 +680,7 @@ class App {
             </div>
 
             <!-- Right: Visitors List -->
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8 h-fit lg:sticky lg:top-24">
+            <div class="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-200 p-3 sm:p-4 lg:p-8 w-full lg:sticky lg:top-24">
               <!-- List Header -->
               <div class="mb-6">
                 <div class="flex items-center justify-between mb-2">
