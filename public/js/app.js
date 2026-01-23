@@ -754,12 +754,41 @@ class App {
         const reader = new FileReader();
         reader.onload = (event) => {
           console.log('Photo loaded, data length:', event.target.result.length);
-          previewImage.src = event.target.result;
-          photoData.value = event.target.result;
-          photoPreview.classList.remove('hidden');
-          photoInputs.classList.add('hidden');
-          console.log('Photo data set to hidden input');
-          this.showToast('✓ Photo captured successfully!', 'success');
+          
+          // Compress image
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Resize to max 800x800 while maintaining aspect ratio
+            let width = img.width;
+            let height = img.height;
+            const maxSize = 800;
+            
+            if (width > height && width > maxSize) {
+              height = (height * maxSize) / width;
+              width = maxSize;
+            } else if (height > maxSize) {
+              width = (width * maxSize) / height;
+              height = maxSize;
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            // Convert to base64 with reduced quality
+            const compressedData = canvas.toDataURL('image/jpeg', 0.7);
+            console.log('Compressed photo, data length:', compressedData.length);
+            
+            previewImage.src = compressedData;
+            photoData.value = compressedData;
+            photoPreview.classList.remove('hidden');
+            photoInputs.classList.add('hidden');
+            this.showToast(`✓ Photo compressed: ${(compressedData.length / 1024).toFixed(0)}KB`, 'success');
+          };
+          img.src = event.target.result;
         };
         reader.onerror = (error) => {
           console.error('FileReader error:', error);
