@@ -782,7 +782,7 @@ class App {
       const email = (formData.get('email') || '').trim();
       const purpose = (formData.get('purpose') || '').trim();
       const personToMeet = (formData.get('personToMeet') || '').trim();
-      const photo = formData.get('photo') || '';
+      const photo = photoData.value || ''; // Get photo from the hidden input directly
       
       // Client-side validation
       if (!name || !phone || !email || !purpose) {
