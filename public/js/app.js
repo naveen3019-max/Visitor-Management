@@ -793,6 +793,13 @@ class App {
     // Visitor form submission
     document.getElementById('visitor-form').addEventListener('submit', async (e) => {
       e.preventDefault();
+      
+      // Prevent double submission
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      if (submitBtn.disabled) return;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="bi bi-hourglass-split text-xl"></i> <span class="ml-2">Submitting...</span>';
+      
       const formData = new FormData(e.target);
       
       // Get values and trim whitespace
@@ -808,11 +815,15 @@ class App {
       // Client-side validation
       if (!name || !phone || !email || !purpose) {
         this.showToast('Please fill in all required fields', 'error');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="bi bi-check-circle-fill text-xl"></i><span class="ml-2">Log Entry</span>';
         return;
       }
       
       if (!photo) {
         this.showToast('❌ Please take or upload a photo of the visitor', 'error');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="bi bi-check-circle-fill text-xl"></i><span class="ml-2">Log Entry</span>';
         return;
       }
       
@@ -830,8 +841,9 @@ class App {
       console.log('Submitting visitor data:', data);
 
       try {
-        await api.logVisitor(data);
-        this.showToast('Visitor logged successfully!', 'success');
+        this.showToast('Sending to server...', 'success');
+        const response = await api.logVisitor(data);
+        this.showToast('✓ Visitor logged successfully!', 'success');
         e.target.reset();
         // Reset photo preview
         photoData.value = '';
@@ -842,9 +854,15 @@ class App {
         photoInputs.classList.remove('hidden');
         // Reload visitors list
         this.loadGuardVisitors();
+        // Re-enable button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="bi bi-check-circle-fill text-xl"></i><span class="ml-2">Log Entry</span>';
       } catch (error) {
         console.error('Error logging visitor:', error);
-        this.showToast(error.message || 'Failed to log visitor', 'error');
+        this.showToast(`❌ Error: ${error.message || 'Failed to log visitor'}`, 'error');
+        // Re-enable button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="bi bi-check-circle-fill text-xl"></i><span class="ml-2">Log Entry</span>';
       }
     });
 
