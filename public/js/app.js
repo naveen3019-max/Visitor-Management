@@ -742,6 +742,7 @@ class App {
 
     const handlePhotoSelect = (e) => {
       const file = e.target.files[0];
+      console.log('Photo selected:', file);
       if (file) {
         if (file.size > 5 * 1024 * 1024) { // 5MB limit
           this.showToast('Photo size must be less than 5MB', 'error');
@@ -750,26 +751,40 @@ class App {
         
         const reader = new FileReader();
         reader.onload = (event) => {
+          console.log('Photo loaded, data length:', event.target.result.length);
           previewImage.src = event.target.result;
           photoData.value = event.target.result;
           photoPreview.classList.remove('hidden');
           photoInputs.classList.add('hidden');
+          console.log('Photo data set to hidden input');
+        };
+        reader.onerror = (error) => {
+          console.error('FileReader error:', error);
+          this.showToast('Failed to read photo', 'error');
         };
         reader.readAsDataURL(file);
+      } else {
+        console.log('No file selected');
       }
     };
 
-    cameraInput.addEventListener('change', handlePhotoSelect);
-    uploadInput.addEventListener('change', handlePhotoSelect);
+    if (cameraInput) {
+      cameraInput.addEventListener('change', handlePhotoSelect);
+    }
+    if (uploadInput) {
+      uploadInput.addEventListener('change', handlePhotoSelect);
+    }
 
-    removePhotoBtn.addEventListener('click', () => {
-      photoData.value = '';
-      previewImage.src = '';
-      cameraInput.value = '';
-      uploadInput.value = '';
-      photoPreview.classList.add('hidden');
-      photoInputs.classList.remove('hidden');
-    });
+    if (removePhotoBtn) {
+      removePhotoBtn.addEventListener('click', () => {
+        photoData.value = '';
+        previewImage.src = '';
+        cameraInput.value = '';
+        uploadInput.value = '';
+        photoPreview.classList.add('hidden');
+        photoInputs.classList.remove('hidden');
+      });
+    }
 
     // Visitor form submission
     document.getElementById('visitor-form').addEventListener('submit', async (e) => {
@@ -783,6 +798,8 @@ class App {
       const purpose = (formData.get('purpose') || '').trim();
       const personToMeet = (formData.get('personToMeet') || '').trim();
       const photo = photoData.value || ''; // Get photo from the hidden input directly
+      
+      console.log('Form submission - Photo length:', photo.length);
       
       // Client-side validation
       if (!name || !phone || !email || !purpose) {
