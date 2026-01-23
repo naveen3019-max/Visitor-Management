@@ -63,6 +63,43 @@ class App {
     }, 3000);
   }
 
+  showPhotoModal(photoUrl, visitorName) {
+    // Remove existing modal if any
+    const existing = document.getElementById('photo-modal');
+    if (existing) existing.remove();
+
+    // Create modal
+    const modal = document.createElement('div');
+    modal.id = 'photo-modal';
+    modal.className = 'fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4';
+    modal.innerHTML = `
+      <div class="relative max-w-4xl max-h-[90vh] w-full">
+        <button id="close-photo-modal" class="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors">
+          <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+        <img src="${photoUrl}" alt="${visitorName}" class="w-full h-full object-contain rounded-lg shadow-2xl">
+        ${visitorName ? `<p class="text-white text-center mt-4 text-lg font-semibold">${visitorName}</p>` : ''}
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Close handlers
+    const closeModal = () => modal.remove();
+    document.getElementById('close-photo-modal').addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', function escHandler(e) {
+      if (e.key === 'Escape') {
+        closeModal();
+        document.removeEventListener('keydown', escHandler);
+      }
+    });
+  }
+
   renderSetup() {
     this.hideLoading();
     const app = document.getElementById('app');
@@ -828,7 +865,7 @@ class App {
               <div class="flex items-start gap-4">
                 <!-- Photo or Avatar -->
                 ${visitor.photo ? `
-                  <img src="${visitor.photo}" alt="${visitorName}" class="w-12 h-12 rounded-full object-cover shadow-sm flex-shrink-0">
+                  <img src="${visitor.photo}" alt="${visitorName}" class="w-12 h-12 rounded-full object-cover shadow-sm flex-shrink-0 cursor-pointer hover:ring-4 hover:ring-blue-300 transition-all" onclick="app.showPhotoModal('${visitor.photo}', '${visitorName}')">
                 ` : `
                   <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm flex-shrink-0">
                     ${visitorInitial}
@@ -1246,7 +1283,7 @@ class App {
             return `
               <div class="flex items-start gap-3 p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
                 ${visitor.photo ? `
-                  <img src="${visitor.photo}" alt="${visitor.name}" class="w-10 h-10 rounded-full object-cover flex-shrink-0">
+                  <img src="${visitor.photo}" alt="${visitor.name}" class="w-10 h-10 rounded-full object-cover flex-shrink-0 cursor-pointer hover:ring-4 hover:ring-blue-300 transition-all" onclick="app.showPhotoModal('${visitor.photo}', '${visitor.name}')">
                 ` : `
                   <div class="${colorClass} w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                     ${initials}
@@ -1490,7 +1527,7 @@ class App {
                       <td class="py-3 px-4 text-sm">
                         <div class="flex items-center gap-2">
                           ${visitor.photo ? `
-                            <img src="${visitor.photo}" alt="${visitor.name}" class="w-8 h-8 rounded-full object-cover">
+                            <img src="${visitor.photo}" alt="${visitor.name}" class="w-8 h-8 rounded-full object-cover cursor-pointer hover:ring-4 hover:ring-blue-300 transition-all" onclick="app.showPhotoModal('${visitor.photo}', '${visitor.name}')">
                           ` : ''}
                           <span class="text-gray-900">${visitor.name || 'N/A'}</span>
                         </div>
@@ -1937,7 +1974,7 @@ class App {
                     <td class="py-3 px-4">
                       <div class="flex items-center gap-3">
                         ${visitor.photo ? `
-                          <img src="${visitor.photo}" alt="${visitor.name}" class="w-10 h-10 rounded-full object-cover flex-shrink-0">
+                          <img src="${visitor.photo}" alt="${visitor.name}" class="w-10 h-10 rounded-full object-cover flex-shrink-0 cursor-pointer hover:ring-4 hover:ring-blue-300 transition-all" onclick="app.showPhotoModal('${visitor.photo}', '${visitor.name}')">
                         ` : `
                           <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
                             <span class="text-indigo-600 font-bold text-sm">${visitor.name?.charAt(0) || '?'}</span>
