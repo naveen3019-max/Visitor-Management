@@ -744,6 +744,8 @@ class App {
       const file = e.target.files[0];
       console.log('Photo selected:', file);
       if (file) {
+        this.showToast(`Photo selected: ${(file.size / 1024).toFixed(0)}KB`, 'success');
+        
         if (file.size > 5 * 1024 * 1024) { // 5MB limit
           this.showToast('Photo size must be less than 5MB', 'error');
           return;
@@ -757,6 +759,7 @@ class App {
           photoPreview.classList.remove('hidden');
           photoInputs.classList.add('hidden');
           console.log('Photo data set to hidden input');
+          this.showToast('✓ Photo captured successfully!', 'success');
         };
         reader.onerror = (error) => {
           console.error('FileReader error:', error);
@@ -765,6 +768,7 @@ class App {
         reader.readAsDataURL(file);
       } else {
         console.log('No file selected');
+        this.showToast('No photo selected', 'error');
       }
     };
 
@@ -808,9 +812,11 @@ class App {
       }
       
       if (!photo) {
-        this.showToast('Please take or upload a photo of the visitor', 'error');
+        this.showToast('❌ Please take or upload a photo of the visitor', 'error');
         return;
       }
+      
+      this.showToast(`✓ Submitting with photo (${(photo.length / 1024).toFixed(0)}KB)...`, 'success');
       
       const data = {
         name: name,
