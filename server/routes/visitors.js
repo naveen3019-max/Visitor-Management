@@ -52,13 +52,13 @@ const checkMemberStatus = async (contact, name, memberId) => {
 // @access  Private (Guard/Admin)
 router.post('/', protect, async (req, res) => {
   try {
-    const { name, contact, memberId, purpose, departmentId, personToMeet } = req.body;
+    const { name, contact, email, photo, memberId, purpose, departmentId, personToMeet } = req.body;
 
-    // Validation - only name, contact, and purpose are required
-    if (!name || !contact || !purpose) {
+    // Validation - name, contact, email, photo, and purpose are required
+    if (!name || !contact || !email || !photo || !purpose) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide all required fields (name, contact, purpose)'
+        message: 'Please provide all required fields (name, contact, email, photo, purpose)'
       });
     }
 
@@ -66,6 +66,8 @@ router.post('/', protect, async (req, res) => {
     const visitor = await Visitor.create({
       name,
       contact,
+      email,
+      photo,
       memberId: memberId || null,
       purpose,
       department: null,
