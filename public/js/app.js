@@ -698,7 +698,7 @@ class App {
               </div>
 
               <!-- List Body -->
-              <div id="visitors-list" class="space-y-4 max-h-[60vh] lg:max-h-[calc(100vh-300px)] overflow-y-auto pr-2 custom-scrollbar">
+              <div id="visitors-list" class="space-y-3 sm:space-y-4 max-h-[60vh] lg:max-h-[calc(100vh-300px)] overflow-y-auto overflow-x-hidden pr-1 sm:pr-2 custom-scrollbar">
                 <div class="flex items-center justify-center py-16">
                   <div class="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-blue-600"></div>
                 </div>
@@ -925,55 +925,55 @@ class App {
           const visitorInitial = visitorName.charAt(0).toUpperCase();
           
           return `
-            <div class="bg-white border-2 ${isInside ? 'border-green-200' : 'border-gray-200'} rounded-xl p-5 hover:shadow-md transition-all duration-200">
-              <div class="flex items-start gap-4">
+            <div class="bg-white border-2 ${isInside ? 'border-green-200' : 'border-gray-200'} rounded-lg sm:rounded-xl p-3 sm:p-5 hover:shadow-md transition-all duration-200">
+              <div class="flex items-start gap-2 sm:gap-4">
                 <!-- Photo or Avatar -->
                 ${visitor.photo ? `
-                  <img src="${visitor.photo}" alt="${visitorName}" class="w-12 h-12 rounded-full object-cover shadow-sm flex-shrink-0 cursor-pointer hover:ring-4 hover:ring-blue-300 transition-all" onclick="app.showPhotoModal('${visitor.photo}', '${visitorName}')">
+                  <img src="${visitor.photo}" alt="${visitorName}" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover shadow-sm flex-shrink-0 cursor-pointer hover:ring-4 hover:ring-blue-300 transition-all" onclick="app.showPhotoModal('${visitor.photo}', '${visitorName}')">
                 ` : `
-                  <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm flex-shrink-0">
+                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-base sm:text-lg shadow-sm flex-shrink-0">
                     ${visitorInitial}
                   </div>
                 `}
                 
                 <!-- Content -->
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-start justify-between gap-3 mb-3">
-                    <div class="flex-1">
-                      <h3 class="font-bold text-gray-900 text-lg mb-1">${visitorName}</h3>
-                      <p class="text-sm text-gray-600 flex items-center gap-2 mb-1">
-                        <i class="bi bi-telephone-fill text-blue-600"></i>
-                        ${visitor.contact || 'N/A'}
+                <div class="flex-1 min-w-0 overflow-hidden">
+                  <div class="flex items-start justify-between gap-2 mb-2 sm:mb-3">
+                    <div class="flex-1 min-w-0">
+                      <h3 class="font-bold text-gray-900 text-sm sm:text-lg mb-1 truncate">${visitorName}</h3>
+                      <p class="text-xs sm:text-sm text-gray-600 flex items-center gap-1.5 sm:gap-2 mb-1 truncate">
+                        <i class="bi bi-telephone-fill text-blue-600 flex-shrink-0"></i>
+                        <span class="truncate">${visitor.contact || 'N/A'}</span>
                       </p>
                       ${visitor.email ? `
-                        <p class="text-sm text-gray-600 flex items-center gap-2">
-                          <i class="bi bi-envelope-fill text-purple-600"></i>
-                          ${visitor.email}
+                        <p class="text-xs sm:text-sm text-gray-600 flex items-center gap-1.5 sm:gap-2 truncate">
+                          <i class="bi bi-envelope-fill text-purple-600 flex-shrink-0"></i>
+                          <span class="truncate">${visitor.email}</span>
                         </p>
                       ` : ''}
                     </div>
-                    <span class="${isInside ? 'bg-green-50 text-green-700 border-green-200' : 'bg-gray-50 text-gray-700 border-gray-200'} px-3 py-1.5 rounded-lg text-xs font-bold border-2 flex items-center gap-1.5 whitespace-nowrap">
+                    <span class="${isInside ? 'bg-green-50 text-green-700 border-green-200' : 'bg-gray-50 text-gray-700 border-gray-200'} px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-bold border-2 flex items-center gap-1 sm:gap-1.5 whitespace-nowrap flex-shrink-0">
                       <i class="bi ${isInside ? 'bi-door-open-fill' : 'bi-door-closed-fill'}"></i>
-                      ${isInside ? 'Inside' : 'Checked Out'}
+                      ${isInside ? 'Inside' : 'Out'}
                     </span>
                   </div>
                   
-                  <div class="space-y-2 text-sm">
-                    <div class="flex items-start gap-2 bg-gray-50 px-3 py-2 rounded-lg">
-                      <i class="bi bi-chat-left-text-fill text-purple-600 text-base mt-0.5 flex-shrink-0"></i>
-                      <p class="text-gray-700 break-words"><span class="font-semibold">Purpose:</span> ${visitor.purpose || 'N/A'}</p>
+                  <div class="space-y-1.5 sm:space-y-2 text-xs sm:text-sm">
+                    <div class="flex items-start gap-1.5 sm:gap-2 bg-gray-50 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
+                      <i class="bi bi-chat-left-text-fill text-purple-600 text-xs sm:text-base mt-0.5 flex-shrink-0"></i>
+                      <p class="text-gray-700 break-words overflow-hidden"><span class="font-semibold">Purpose:</span> ${visitor.purpose || 'N/A'}</p>
                     </div>
                     ${visitor.personToMeet && visitor.personToMeet !== 'N/A' ? `
-                      <div class="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg">
-                        <i class="bi bi-person-fill text-amber-600 text-base"></i>
-                        <p class="text-gray-700"><span class="font-semibold">Meeting:</span> ${visitor.personToMeet}</p>
+                      <div class="flex items-center gap-1.5 sm:gap-2 bg-gray-50 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
+                        <i class="bi bi-person-fill text-amber-600 text-xs sm:text-base flex-shrink-0"></i>
+                        <p class="text-gray-700 truncate"><span class="font-semibold">Meeting:</span> ${visitor.personToMeet}</p>
                       </div>
                     ` : ''}
-                    <div class="flex items-center gap-2 text-xs text-gray-500 pt-1">
-                      <i class="bi bi-clock-fill text-blue-600"></i>
-                      ${timeIn.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
+                    <div class="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-gray-500 pt-0.5 sm:pt-1">
+                      <i class="bi bi-clock-fill text-blue-600 flex-shrink-0"></i>
+                      <span class="truncate">${timeIn.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
                       <span class="mx-1">•</span>
-                      ${timeIn.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      ${timeIn.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                     </div>
                   </div>
                 </div>
