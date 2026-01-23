@@ -530,31 +530,31 @@ class App {
   async renderGuardDashboard() {
     const app = document.getElementById('app');
     app.innerHTML = `
-      <div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+      <div class="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
         <!-- Simple Header -->
-        <header class="bg-white shadow-sm border-b border-gray-200">
+        <header class="bg-white shadow-md border-b border-gray-200 sticky top-0 z-10">
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div class="flex items-center justify-between">
               <!-- Left: Logo & Title -->
               <div class="flex items-center gap-3">
-                <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center shadow-md">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center shadow-lg">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="white" viewBox="0 0 24 24">
                     <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 16h2v2h-2v-2zm0-10h2v8h-2V7z"/>
                   </svg>
                 </div>
                 <div>
-                  <h1 class="text-xl font-bold text-gray-900">Security Guard Portal</h1>
-                  <p class="text-sm text-gray-600">Visitor Management</p>
+                  <h1 class="text-lg sm:text-xl font-bold text-gray-900">Security Guard Portal</h1>
+                  <p class="text-xs sm:text-sm text-gray-600">Visitor Management</p>
                 </div>
               </div>
               
               <!-- Right: User & Logout -->
-              <div class="flex items-center gap-3">
+              <div class="flex items-center gap-2 sm:gap-3">
                 <div class="hidden sm:block text-right">
                   <p class="text-sm font-semibold text-gray-900">${auth.getUser().fullName}</p>
                   <p class="text-xs text-gray-500">Security Guard</p>
                 </div>
-                <button id="logout-btn" class="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-all shadow-sm">
+                <button id="logout-btn" class="flex items-center gap-2 px-3 sm:px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-all shadow-sm">
                   <i class="bi bi-box-arrow-right text-white text-lg"></i>
                   <span class="hidden sm:inline">Logout</span>
                 </button>
@@ -564,107 +564,107 @@ class App {
         </header>
 
         <!-- Main Content -->
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div class="grid lg:grid-cols-2 gap-6">
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+          <div class="grid lg:grid-cols-2 gap-4 sm:gap-6">
             <!-- Left: Visitor Entry Form -->
-            <div class="bg-white rounded-2xl shadow-md border border-gray-200 p-8">
+            <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8 h-fit">
               <!-- Form Header -->
               <div class="mb-6">
                 <div class="flex items-center gap-3 mb-2">
                   <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
                     <i class="bi bi-person-plus-fill text-emerald-600 text-xl"></i>
                   </div>
-                  <h2 class="text-2xl font-bold text-gray-900">Log New Visitor</h2>
+                  <h2 class="text-xl sm:text-2xl font-bold text-gray-900">Log New Visitor</h2>
                 </div>
-                <p class="text-sm text-gray-600 ml-13">Enter visitor details at the gate</p>
+                <p class="text-xs sm:text-sm text-gray-600 ml-13">Enter visitor details at the gate</p>
               </div>
 
               <!-- Form -->
-              <form id="visitor-form" class="space-y-6">
+              <form id="visitor-form" class="space-y-4 sm:space-y-6">
                 <!-- Visitor Name -->
                 <div>
-                  <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                    <i class="bi bi-person-fill text-gray-600 text-lg"></i>
+                  <label class="flex items-center gap-2 text-xs sm:text-sm font-semibold text-gray-700 mb-2">
+                    <i class="bi bi-person-fill text-gray-600 text-base sm:text-lg"></i>
                     Visitor Name <span class="text-red-500">*</span>
                   </label>
                   <input type="text" name="name" required 
-                    class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none"
+                    class="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border border-gray-300 rounded-lg text-sm sm:text-base text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none"
                     placeholder="Enter visitor's full name">
                 </div>
 
                 <!-- Phone Number -->
                 <div>
-                  <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                    <i class="bi bi-telephone-fill text-gray-600 text-lg"></i>
+                  <label class="flex items-center gap-2 text-xs sm:text-sm font-semibold text-gray-700 mb-2">
+                    <i class="bi bi-telephone-fill text-gray-600 text-base sm:text-lg"></i>
                     Phone Number <span class="text-red-500">*</span>
                   </label>
                   <input type="tel" name="phone" required 
-                    class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none"
+                    class="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border border-gray-300 rounded-lg text-sm sm:text-base text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none"
                     placeholder="Enter contact number">
                 </div>
 
                 <!-- Email Address -->
                 <div>
-                  <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                    <i class="bi bi-envelope-fill text-gray-600 text-lg"></i>
+                  <label class="flex items-center gap-2 text-xs sm:text-sm font-semibold text-gray-700 mb-2">
+                    <i class="bi bi-envelope-fill text-gray-600 text-base sm:text-lg"></i>
                     Email Address <span class="text-red-500">*</span>
                   </label>
                   <input type="email" name="email" required
-                    class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none"
+                    class="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border border-gray-300 rounded-lg text-sm sm:text-base text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none"
                     placeholder="Enter email address">
                 </div>
 
                 <!-- Reason for Visit -->
                 <div>
-                  <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                    <i class="bi bi-file-text-fill text-gray-600 text-lg"></i>
+                  <label class="flex items-center gap-2 text-xs sm:text-sm font-semibold text-gray-700 mb-2">
+                    <i class="bi bi-file-text-fill text-gray-600 text-base sm:text-lg"></i>
                     Reason for Visit <span class="text-red-500">*</span>
                   </label>
                   <textarea name="purpose" required rows="3"
-                    class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none resize-none"
+                    class="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border border-gray-300 rounded-lg text-sm sm:text-base text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none resize-none"
                     placeholder="Enter the purpose of visit (e.g., Meeting, Interview, Delivery...)"></textarea>
                 </div>
 
                 <!-- Person to Meet -->
                 <div>
-                  <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                    <i class="bi bi-people-fill text-gray-600 text-lg"></i>
+                  <label class="flex items-center gap-2 text-xs sm:text-sm font-semibold text-gray-700 mb-2">
+                    <i class="bi bi-people-fill text-gray-600 text-base sm:text-lg"></i>
                     Person to Meet <span class="text-xs text-gray-500 font-normal">(Optional)</span>
                   </label>
                   <input type="text" name="personToMeet"
-                    class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none"
+                    class="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border border-gray-300 rounded-lg text-sm sm:text-base text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none"
                     placeholder="Name of person to meet">
                 </div>
 
                 <!-- Visitor Photo -->
                 <div>
-                  <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                    <i class="bi bi-camera-fill text-gray-600 text-lg"></i>
+                  <label class="flex items-center gap-2 text-xs sm:text-sm font-semibold text-gray-700 mb-2">
+                    <i class="bi bi-camera-fill text-gray-600 text-base sm:text-lg"></i>
                     Visitor Photo <span class="text-red-500">*</span>
                   </label>
                   <div class="space-y-3">
                     <!-- Photo Preview -->
                     <div id="photo-preview" class="hidden">
                       <div class="relative inline-block">
-                        <img id="preview-image" class="w-32 h-32 object-cover rounded-lg border-2 border-gray-300" alt="Preview">
-                        <button type="button" id="remove-photo" class="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-md transition-all">
-                          <i class="bi bi-x-lg text-sm"></i>
+                        <img id="preview-image" class="w-24 h-24 sm:w-32 sm:h-32 object-cover rounded-lg border-2 border-gray-300" alt="Preview">
+                        <button type="button" id="remove-photo" class="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 shadow-md transition-all">
+                          <i class="bi bi-x-lg text-xs sm:text-sm"></i>
                         </button>
                       </div>
                     </div>
                     <!-- Photo Input Buttons -->
-                    <div id="photo-inputs" class="flex gap-2">
+                    <div id="photo-inputs" class="flex flex-col sm:flex-row gap-2">
                       <label class="flex-1 cursor-pointer">
-                        <div class="flex items-center justify-center gap-2 px-4 py-3 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-300 rounded-lg transition-all">
-                          <i class="bi bi-camera text-lg"></i>
-                          <span class="text-sm font-medium">Take Photo</span>
+                        <div class="flex items-center justify-center gap-2 px-4 py-3 sm:py-3.5 bg-blue-50 hover:bg-blue-100 active:bg-blue-200 text-blue-700 border-2 border-blue-300 rounded-lg transition-all touch-manipulation">
+                          <i class="bi bi-camera text-lg sm:text-xl"></i>
+                          <span class="text-sm sm:text-base font-medium">Take Photo</span>
                         </div>
                         <input type="file" id="camera-input" accept="image/*" capture="user" class="hidden">
                       </label>
                       <label class="flex-1 cursor-pointer">
-                        <div class="flex items-center justify-center gap-2 px-4 py-3 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-300 rounded-lg transition-all">
-                          <i class="bi bi-upload text-lg"></i>
-                          <span class="text-sm font-medium">Upload Photo</span>
+                        <div class="flex items-center justify-center gap-2 px-4 py-3 sm:py-3.5 bg-purple-50 hover:bg-purple-100 active:bg-purple-200 text-purple-700 border-2 border-purple-300 rounded-lg transition-all touch-manipulation">
+                          <i class="bi bi-upload text-lg sm:text-xl"></i>
+                          <span class="text-sm sm:text-base font-medium">Upload Photo</span>
                         </div>
                         <input type="file" id="upload-input" accept="image/*" class="hidden">
                       </label>
@@ -674,11 +674,11 @@ class App {
                 </div>
 
                 <!-- Submit Button -->
-                <div class="mt-6">
+                <div class="mt-4 sm:mt-6">
                   <button type="submit" 
                     style="display: block !important; visibility: visible !important;"
-                    class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 px-6 rounded-lg font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-200">
-                    <i class="bi bi-check-circle-fill text-xl"></i>
+                    class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 active:scale-[0.98] text-white py-3.5 sm:py-4 px-6 rounded-lg font-bold text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-200 touch-manipulation">
+                    <i class="bi bi-check-circle-fill text-lg sm:text-xl"></i>
                     <span class="ml-2">Log Entry</span>
                   </button>
                 </div>
@@ -686,7 +686,7 @@ class App {
             </div>
 
             <!-- Right: Visitors List -->
-            <div class="bg-white rounded-2xl shadow-md border border-gray-200 p-8">
+            <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8 h-fit lg:sticky lg:top-24">
               <!-- List Header -->
               <div class="mb-6">
                 <div class="flex items-center justify-between mb-2">
@@ -694,17 +694,17 @@ class App {
                     <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
                       <i class="bi bi-clock-history text-purple-600 text-xl"></i>
                     </div>
-                    <h2 class="text-2xl font-bold text-gray-900">Today's Visitors</h2>
+                    <h2 class="text-xl sm:text-2xl font-bold text-gray-900">Today's Visitors</h2>
                   </div>
                   <button id="refresh-list" class="p-2 hover:bg-gray-100 rounded-lg transition-all">
                     <i class="bi bi-arrow-clockwise text-gray-600 text-xl"></i>
                   </button>
                 </div>
-                <p class="text-sm text-gray-600 ml-13">Recent entries logged by you</p>
+                <p class="text-xs sm:text-sm text-gray-600 ml-13">Recent entries logged by you</p>
               </div>
 
               <!-- List Body -->
-              <div id="visitors-list" class="space-y-4 max-h-[calc(100vh-300px)] overflow-y-auto pr-2">
+              <div id="visitors-list" class="space-y-4 max-h-[60vh] lg:max-h-[calc(100vh-300px)] overflow-y-auto pr-2 custom-scrollbar">
                 <div class="flex items-center justify-center py-16">
                   <div class="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-blue-600"></div>
                 </div>
