@@ -533,30 +533,30 @@ class App {
       <div class="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
         <!-- Simple Header -->
         <header class="bg-white shadow-md border-b border-gray-200 sticky top-0 z-10">
-          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div class="flex items-center justify-between">
+          <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-3 sm:py-4">
+            <div class="flex items-center justify-between gap-2">
               <!-- Left: Logo & Title -->
-              <div class="flex items-center gap-3">
-                <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center shadow-lg">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="white" viewBox="0 0 24 24">
+              <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center shadow-lg flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-7 sm:w-7" fill="white" viewBox="0 0 24 24">
                     <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 16h2v2h-2v-2zm0-10h2v8h-2V7z"/>
                   </svg>
                 </div>
-                <div>
-                  <h1 class="text-lg sm:text-xl font-bold text-gray-900">Security Guard Portal</h1>
-                  <p class="text-xs sm:text-sm text-gray-600">Visitor Management</p>
+                <div class="min-w-0 flex-1">
+                  <h1 class="text-sm sm:text-lg md:text-xl font-bold text-gray-900 truncate">Security Guard Portal</h1>
+                  <p class="text-xs sm:text-sm text-gray-600 truncate">Visitor Management</p>
                 </div>
               </div>
               
               <!-- Right: User & Logout -->
-              <div class="flex items-center gap-2 sm:gap-3">
-                <div class="hidden sm:block text-right">
-                  <p class="text-sm font-semibold text-gray-900">${auth.getUser().fullName}</p>
+              <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                <div class="hidden md:block text-right">
+                  <p class="text-sm font-semibold text-gray-900 truncate max-w-[150px]">${auth.getUser().fullName}</p>
                   <p class="text-xs text-gray-500">Security Guard</p>
                 </div>
-                <button id="logout-btn" class="flex items-center gap-2 px-3 sm:px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-all shadow-sm">
-                  <i class="bi bi-box-arrow-right text-white text-lg"></i>
-                  <span class="hidden sm:inline">Logout</span>
+                <button id="logout-btn" class="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 md:px-4 py-2 bg-red-500 hover:bg-red-600 active:bg-red-700 text-white rounded-lg font-medium transition-all shadow-sm touch-manipulation">
+                  <i class="bi bi-box-arrow-right text-white text-base sm:text-lg"></i>
+                  <span class="text-xs sm:text-sm md:inline">Logout</span>
                 </button>
               </div>
             </div>
@@ -564,10 +564,10 @@ class App {
         </header>
 
         <!-- Main Content -->
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <main class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
           <div class="grid lg:grid-cols-2 gap-4 sm:gap-6">
             <!-- Left: Visitor Entry Form -->
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8 h-fit">
+            <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 sm:p-6 lg:p-8 h-fit"
               <!-- Form Header -->
               <div class="mb-6">
                 <div class="flex items-center gap-3 mb-2">
