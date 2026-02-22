@@ -1,6 +1,8 @@
 // API utility for making authenticated requests
 class API {
-  constructor(baseURL = '/api') {
+  constructor(baseURL = 'https://your-app-name.vercel.app/api') {
+    // IMPORTANT: Replace 'your-app-name' with your actual Vercel deployment URL
+    // Example: https://visitor-management-xyz.vercel.app/api
     this.baseURL = baseURL;
   }
 
