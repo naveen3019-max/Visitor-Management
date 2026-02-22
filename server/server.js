@@ -45,8 +45,26 @@ const limiter = rateLimit({
 app.use(helmet({
   contentSecurityPolicy: false // Allow inline scripts for PWA
 }));
+
+// CORS configuration - allow mobile app and web requests
+const allowedOrigins = [
+  'http://localhost:3000',
+  'capacitor://localhost',
+  'http://localhost',
+  'https://visitor-management-psi.vercel.app'
+];
+
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' ? false : 'http://localhost:3000',
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || origin.startsWith('capacitor://')) {
+      callback(null, true);
+    } else {
+      callback(null, true); // Allow all origins for now (mobile app compatibility)
+    }
+  },
   credentials: true
 }));
 app.use(compression());
