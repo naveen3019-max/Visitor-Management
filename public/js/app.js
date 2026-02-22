@@ -782,6 +782,37 @@ class App {
             photoData.value = compressedData;
             photoPreview.classList.remove('hidden');
             photoInputs.classList.add('hidden');
+            
+            // Save the photo to form state and restore other fields
+            const savedState = localStorage.getItem('visitorFormState');
+            if (savedState) {
+              try {
+                const formState = JSON.parse(savedState);
+                formState.photo = compressedData; // Update with new photo
+                localStorage.setItem('visitorFormState', JSON.stringify(formState));
+                
+                // Restore all form fields
+                const form = document.getElementById('visitor-form');
+                if (form) {
+                  const nameInput = form.querySelector('[name="name"]');
+                  const phoneInput = form.querySelector('[name="phone"]');
+                  const emailInput = form.querySelector('[name="email"]');
+                  const purposeInput = form.querySelector('[name="purpose"]');
+                  const personToMeetInput = form.querySelector('[name="personToMeet"]');
+                  
+                  if (nameInput && formState.name) nameInput.value = formState.name;
+                  if (phoneInput && formState.phone) phoneInput.value = formState.phone;
+                  if (emailInput && formState.email) emailInput.value = formState.email;
+                  if (purposeInput && formState.purpose) purposeInput.value = formState.purpose;
+                  if (personToMeetInput && formState.personToMeet) personToMeetInput.value = formState.personToMeet;
+                  
+                  console.log('Form fields restored after photo selection');
+                }
+              } catch (error) {
+                console.error('Error restoring form after photo:', error);
+              }
+            }
+            
             this.showToast(`✓ Photo compressed: ${(compressedData.length / 1024).toFixed(0)}KB`, 'success');
           };
           img.src = event.target.result;
@@ -797,13 +828,83 @@ class App {
       }
     };
 
+    // Save form state before opening camera/upload
+    const saveFormState = () => {
+      const form = document.getElementById('visitor-form');
+      if (form) {
+        const formState = {
+          name: form.querySelector('[name="name"]')?.value || '',
+          phone: form.querySelector('[name="phone"]')?.value || '',
+          email: form.querySelector('[name="email"]')?.value || '',
+          purpose: form.querySelector('[name="purpose"]')?.value || '',
+          personToMeet: form.querySelector('[name="personToMeet"]')?.value || '',
+          photo: photoData.value || ''
+        };
+        localStorage.setItem('visitorFormState', JSON.stringify(formState));
+        console.log('Form state saved:', formState);
+      }
+    };
+
+    // Restore form state after camera/upload
+    const restoreFormState = () => {
+      const savedState = localStorage.getItem('visitorFormState');
+      if (savedState) {
+        try {
+          const formState = JSON.parse(savedState);
+          const form = document.getElementById('visitor-form');
+          if (form) {
+            const nameInput = form.querySelector('[name="name"]');
+            const phoneInput = form.querySelector('[name="phone"]');
+            const emailInput = form.querySelector('[name="email"]');
+            const purposeInput = form.querySelector('[name="purpose"]');
+            const personToMeetInput = form.querySelector('[name="personToMeet"]');
+            
+            if (nameInput) nameInput.value = formState.name || '';
+            if (phoneInput) phoneInput.value = formState.phone || '';
+            if (emailInput) emailInput.value = formState.email || '';
+            if (purposeInput) purposeInput.value = formState.purpose || '';
+            if (personToMeetInput) personToMeetInput.value = formState.personToMeet || '';
+            
+            // Restore photo if it was there before
+            if (formState.photo && !photoData.value) {
+              photoData.value = formState.photo;
+              previewImage.src = formState.photo;
+              photoPreview.classList.remove('hidden');
+              photoInputs.classList.add('hidden');
+            }
+            
+            console.log('Form state restored:', formState);
+          }
+        } catch (error) {
+          console.error('Error restoring form state:', error);
+        }
+      }
+    };
+
+    // Try to restore form state on page load (in case app was recreated)
+    restoreFormState();
+
     if (cameraInput) {
-      // Session persists in localStorage automatically
       cameraInput.addEventListener('change', handlePhotoSelect);
     }
     if (uploadInput) {
-      // Session persists in localStorage automatically
       uploadInput.addEventListener('change', handlePhotoSelect);
+    }
+
+    // Save form state when camera/upload label is clicked (before camera opens)
+    const cameraLabel = document.getElementById('camera-label');
+    const uploadLabel = document.getElementById('upload-label');
+    if (cameraLabel) {
+      cameraLabel.addEventListener('click', () => {
+        console.log('Camera button clicked, saving form state');
+        saveFormState();
+      });
+    }
+    if (uploadLabel) {
+      uploadLabel.addEventListener('click', () => {
+        console.log('Upload button clicked, saving form state');
+        saveFormState();
+      });
     }
 
     if (removePhotoBtn) {
@@ -879,6 +980,9 @@ class App {
         uploadInput.value = '';
         photoPreview.classList.add('hidden');
         photoInputs.classList.remove('hidden');
+        // Clear saved form state
+        localStorage.removeItem('visitorFormState');
+        console.log('Form state cleared after successful submission');
         // Reload visitors list
         this.loadGuardVisitors();
         // Re-enable button
@@ -2643,7 +2747,47 @@ document.addEventListener('DOMContentLoaded', () => {
       // Check if user is still authenticated
       if (auth.isAuthenticated()) {
         console.log('User still authenticated:', auth.getUser());
-        // Session is still valid, no need to re-login
+        
+        // Restore form state if visitor form exists (guard dashboard)
+        const visitorForm = document.getElementById('visitor-form');
+        if (visitorForm) {
+          const savedState = localStorage.getItem('visitorFormState');
+          if (savedState) {
+            try {
+              const formState = JSON.parse(savedState);
+              console.log('Restoring form state on app resume:', formState);
+              
+              const nameInput = visitorForm.querySelector('[name="name"]');
+              const phoneInput = visitorForm.querySelector('[name="phone"]');
+              const emailInput = visitorForm.querySelector('[name="email"]');
+              const purposeInput = visitorForm.querySelector('[name="purpose"]');
+              const personToMeetInput = visitorForm.querySelector('[name="personToMeet"]');
+              const photoData = document.getElementById('photo-data');
+              const previewImage = document.getElementById('preview-image');
+              const photoPreview = document.getElementById('photo-preview');
+              const photoInputs = document.getElementById('photo-inputs');
+              
+              if (nameInput && formState.name) nameInput.value = formState.name;
+              if (phoneInput && formState.phone) phoneInput.value = formState.phone;
+              if (emailInput && formState.email) emailInput.value = formState.email;
+              if (purposeInput && formState.purpose) purposeInput.value = formState.purpose;
+              if (personToMeetInput && formState.personToMeet) personToMeetInput.value = formState.personToMeet;
+              
+              // Restore photo if available
+              if (formState.photo && photoData && previewImage) {
+                photoData.value = formState.photo;
+                previewImage.src = formState.photo;
+                if (photoPreview) photoPreview.classList.remove('hidden');
+                if (photoInputs) photoInputs.classList.add('hidden');
+                console.log('Photo restored from state');
+              }
+              
+              console.log('Form state restored successfully');
+            } catch (error) {
+              console.error('Error restoring form state on resume:', error);
+            }
+          }
+        }
       } else {
         console.log('User session lost, redirecting to login');
       }
@@ -2654,9 +2798,49 @@ document.addEventListener('DOMContentLoaded', () => {
   if (window.Capacitor) {
     window.Capacitor.Plugins.App?.addListener('appStateChange', ({ isActive }) => {
       console.log('App state changed:', isActive);
-      if (isActive && auth.isAuthenticated()) {
+      if (isActive && auth.isAuthenticated() && window.app) {
         console.log('App resumed, user authenticated');
-        // Refresh current view if needed
+        
+        // Restore form state if visitor form exists (guard dashboard)
+        const visitorForm = document.getElementById('visitor-form');
+        if (visitorForm) {
+          const savedState = localStorage.getItem('visitorFormState');
+          if (savedState) {
+            try {
+              const formState = JSON.parse(savedState);
+              console.log('Restoring form state on Capacitor resume:', formState);
+              
+              const nameInput = visitorForm.querySelector('[name="name"]');
+              const phoneInput = visitorForm.querySelector('[name="phone"]');
+              const emailInput = visitorForm.querySelector('[name="email"]');
+              const purposeInput = visitorForm.querySelector('[name="purpose"]');
+              const personToMeetInput = visitorForm.querySelector('[name="personToMeet"]');
+              const photoData = document.getElementById('photo-data');
+              const previewImage = document.getElementById('preview-image');
+              const photoPreview = document.getElementById('photo-preview');
+              const photoInputs = document.getElementById('photo-inputs');
+              
+              if (nameInput && formState.name) nameInput.value = formState.name;
+              if (phoneInput && formState.phone) phoneInput.value = formState.phone;
+              if (emailInput && formState.email) emailInput.value = formState.email;
+              if (purposeInput && formState.purpose) purposeInput.value = formState.purpose;
+              if (personToMeetInput && formState.personToMeet) personToMeetInput.value = formState.personToMeet;
+              
+              // Restore photo if available
+              if (formState.photo && photoData && previewImage) {
+                photoData.value = formState.photo;
+                previewImage.src = formState.photo;
+                if (photoPreview) photoPreview.classList.remove('hidden');
+                if (photoInputs) photoInputs.classList.add('hidden');
+                console.log('Photo restored from state on Capacitor resume');
+              }
+              
+              console.log('Form state restored successfully on Capacitor resume');
+            } catch (error) {
+              console.error('Error restoring form state on Capacitor resume:', error);
+            }
+          }
+        }
       }
     });
   }
