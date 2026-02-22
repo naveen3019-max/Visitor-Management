@@ -8,7 +8,11 @@
     "dev": "nodemon server/server.js",
     "build": "npx tailwindcss -i ./public/css/input.css -o ./public/css/styles.css --minify",
     "build:css": "npx tailwindcss -i ./public/css/input.css -o ./public/css/styles.css --watch",
-    "vercel-build": "npx tailwindcss -i ./public/css/input.css -o ./public/css/styles.css --minify"
+    "vercel-build": "npx tailwindcss -i ./public/css/input.css -o ./public/css/styles.css --minify",
+    "cap:sync": "npx cap sync",
+    "cap:open": "npx cap open android",
+    "cap:build": "npm run build && npx cap sync && npx cap copy",
+    "android": "npm run cap:build && npx cap open android"
   },
   "keywords": [
     "visitor",
@@ -19,6 +23,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@capacitor/android": "^8.1.0",
+    "@capacitor/cli": "^8.1.0",
+    "@capacitor/core": "^8.1.0",
     "bcryptjs": "^2.4.3",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
