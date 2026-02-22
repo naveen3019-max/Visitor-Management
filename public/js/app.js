@@ -648,14 +648,14 @@ class App {
                     </div>
                     <!-- Photo Input Buttons -->
                     <div id="photo-inputs" class="flex flex-col sm:flex-row gap-2">
-                      <label class="flex-1 cursor-pointer">
+                      <label id="camera-label" class="flex-1 cursor-pointer">
                         <div class="flex items-center justify-center gap-2 px-4 py-3 sm:py-3.5 bg-blue-50 hover:bg-blue-100 active:bg-blue-200 text-blue-700 border-2 border-blue-300 rounded-lg transition-all touch-manipulation">
                           <i class="bi bi-camera text-lg sm:text-xl"></i>
                           <span class="text-sm sm:text-base font-medium">Take Photo</span>
                         </div>
                         <input type="file" id="camera-input" accept="image/*" capture="user" class="hidden">
                       </label>
-                      <label class="flex-1 cursor-pointer">
+                      <label id="upload-label" class="flex-1 cursor-pointer">
                         <div class="flex items-center justify-center gap-2 px-4 py-3 sm:py-3.5 bg-purple-50 hover:bg-purple-100 active:bg-purple-200 text-purple-700 border-2 border-purple-300 rounded-lg transition-all touch-manipulation">
                           <i class="bi bi-upload text-lg sm:text-xl"></i>
                           <span class="text-sm sm:text-base font-medium">Upload Photo</span>
@@ -796,9 +796,34 @@ class App {
     };
 
     if (cameraInput) {
+      // Save session before opening camera
+      const cameraLabel = document.getElementById('camera-label');
+      if (cameraLabel) {
+        cameraLabel.addEventListener('click', () => {
+          console.log('Opening camera, saving session...');
+          // Ensure user data is persisted
+          if (auth.isAuthenticated()) {
+            auth.setUser(auth.getUser());
+            localStorage.setItem('sessionSaved', Date.now().toString());
+          }
+        });
+      }
+      
       cameraInput.addEventListener('change', handlePhotoSelect);
     }
     if (uploadInput) {
+      // Save session before opening file picker
+      const uploadLabel = document.getElementById('upload-label');
+      if (uploadLabel) {
+        uploadLabel.addEventListener('click', () => {
+          console.log('Opening file picker, saving session...');
+          if (auth.isAuthenticated()) {
+            auth.setUser(auth.getUser());
+            localStorage.setItem('sessionSaved', Date.now().toString());
+          }
+        });
+      }
+      
       uploadInput.addEventListener('change', handlePhotoSelect);
     }
 
@@ -2629,4 +2654,31 @@ class App {
 // Initialize app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   window.app = new App();
+  
+  // Handle app resume (when coming back from camera)
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && window.app) {
+      // App came back to foreground
+      console.log('App resumed from background');
+      
+      // Check if user is still authenticated
+      if (auth.isAuthenticated()) {
+        console.log('User still authenticated:', auth.getUser());
+        // Session is still valid, no need to re-login
+      } else {
+        console.log('User session lost, redirecting to login');
+      }
+    }
+  });
+  
+  // Handle app pause/resume for Capacitor
+  if (window.Capacitor) {
+    window.Capacitor.Plugins.App?.addListener('appStateChange', ({ isActive }) => {
+      console.log('App state changed:', isActive);
+      if (isActive && auth.isAuthenticated()) {
+        console.log('App resumed, user authenticated');
+        // Refresh current view if needed
+      }
+    });
+  }
 });
