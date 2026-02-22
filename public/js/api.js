@@ -6,13 +6,18 @@ class API {
 
   async request(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`;
+    
+    // Get token from localStorage (for mobile app persistence)
+    const token = localStorage.getItem('authToken');
+    
     const config = {
       ...options,
       headers: {
         'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
         ...options.headers
       },
-      credentials: 'include' // Include cookies
+      credentials: 'include' // Include cookies for web
     };
 
     try {

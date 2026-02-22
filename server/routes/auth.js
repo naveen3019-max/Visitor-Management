@@ -146,6 +146,7 @@ router.post('/login', async (req, res) => {
     res.json({
       success: true,
       message: 'Login successful',
+      token: token, // Include token for mobile apps to store in localStorage
       user: {
         id: user._id,
         username: user.username,

@@ -19,7 +19,8 @@ class App {
         // Verify session is still valid
         try {
           const userData = await api.getCurrentUser();
-          auth.setUser(userData.user);
+          auth.setUser(userData.user, auth.getToken());
+          console.log('Session validated, token persisted');
           this.renderDashboard();
           this.startNotificationPolling();
         } catch (error) {
@@ -230,7 +231,8 @@ class App {
       try {
         this.showLoading();
         const response = await api.login(credentials);
-        auth.setUser(response.user);
+        auth.setUser(response.user, response.token);
+        console.log('Login successful, token stored');
         this.showToast('Login successful!');
         this.renderDashboard();
         this.startNotificationPolling();
@@ -796,34 +798,11 @@ class App {
     };
 
     if (cameraInput) {
-      // Save session before opening camera
-      const cameraLabel = document.getElementById('camera-label');
-      if (cameraLabel) {
-        cameraLabel.addEventListener('click', () => {
-          console.log('Opening camera, saving session...');
-          // Ensure user data is persisted
-          if (auth.isAuthenticated()) {
-            auth.setUser(auth.getUser());
-            localStorage.setItem('sessionSaved', Date.now().toString());
-          }
-        });
-      }
-      
+      // Session persists in localStorage automatically
       cameraInput.addEventListener('change', handlePhotoSelect);
     }
     if (uploadInput) {
-      // Save session before opening file picker
-      const uploadLabel = document.getElementById('upload-label');
-      if (uploadLabel) {
-        uploadLabel.addEventListener('click', () => {
-          console.log('Opening file picker, saving session...');
-          if (auth.isAuthenticated()) {
-            auth.setUser(auth.getUser());
-            localStorage.setItem('sessionSaved', Date.now().toString());
-          }
-        });
-      }
-      
+      // Session persists in localStorage automatically
       uploadInput.addEventListener('change', handlePhotoSelect);
     }
 

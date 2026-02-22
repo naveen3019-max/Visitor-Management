@@ -12,13 +12,21 @@ class Auth {
     }
   }
 
-  setUser(user) {
+  setUser(user, token) {
     this.user = user;
     localStorage.setItem('user', JSON.stringify(user));
+    if (token) {
+      localStorage.setItem('authToken', token);
+      console.log('Auth token stored in localStorage');
+    }
   }
 
   getUser() {
     return this.user;
+  }
+  
+  getToken() {
+    return localStorage.getItem('authToken');
   }
 
   getRole() {
@@ -26,7 +34,7 @@ class Auth {
   }
 
   isAuthenticated() {
-    return this.user !== null;
+    return this.user !== null && this.getToken() !== null;
   }
 
   isPrincipal() {
@@ -40,6 +48,9 @@ class Auth {
   clear() {
     this.user = null;
     localStorage.removeItem('user');
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('sessionSaved');
+    console.log('Auth cleared from localStorage');
   }
 }
 

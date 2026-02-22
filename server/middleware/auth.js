@@ -1,10 +1,15 @@
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../config/jwt');
 
-// Verify JWT token from HTTP-only cookie
+// Verify JWT token from HTTP-only cookie or Authorization header
 const protect = async (req, res, next) => {
   try {
-    const token = req.cookies.token;
+    let token = req.cookies.token;
+    
+    // Check Authorization header if no cookie (for mobile apps)
+    if (!token && req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+      token = req.headers.authorization.substring(7);
+    }
 
     if (!token) {
       return res.status(401).json({
