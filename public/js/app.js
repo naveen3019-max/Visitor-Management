@@ -1187,6 +1187,25 @@ class App {
                   </div>
                 </div>
                 
+                <!-- Recent Notifications Card -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg">
+                  <h2 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                    </svg>
+                    Recent Notifications
+                    <span id="home-notification-count" class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full hidden"></span>
+                  </h2>
+                  <div class="space-y-3" id="recent-notifications-list">
+                    <div class="flex items-center justify-center py-8">
+                      <div class="animate-spin rounded-full h-8 w-8 border-4 border-gray-200 border-t-indigo-600"></div>
+                    </div>
+                  </div>
+                  <button onclick="app.renderNotifications()" class="w-full mt-4 py-2 text-center text-indigo-600 hover:bg-indigo-50 rounded-lg font-semibold transition-colors">
+                    View All Notifications
+                  </button>
+                </div>
+                
                 <!-- Recent Visitors Card -->
                 <div class="bg-white rounded-2xl p-6 shadow-lg">
                   <h2 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
@@ -1375,12 +1394,97 @@ class App {
           }).join('');
         }
       }
+      
+      // Load recent notifications
+      this.loadRecentNotifications();
     } catch (error) {
       console.error('Failed to load stats:', error);
     }
 
     // Update pending user badge
     this.updatePendingBadge();
+  }
+  
+  async loadRecentNotifications() {
+    try {
+      const response = await api.getNotifications({ limit: 5 });
+      const notificationsList = document.getElementById('recent-notifications-list');
+      const notificationCount = document.getElementById('home-notification-count');
+      
+      if (!notificationsList) return;
+      
+      // Update count badge
+      if (notificationCount && response.unreadCount > 0) {
+        notificationCount.textContent = response.unreadCount;
+        notificationCount.classList.remove('hidden');
+      }
+      
+      if (response.notifications && response.notifications.length > 0) {
+        notificationsList.innerHTML = response.notifications.map(notification => {
+          const time = new Date(notification.createdAt);
+          const timeString = time.toLocaleString('en-US', { 
+            month: 'short', 
+            day: 'numeric',
+            hour: '2-digit', 
+            minute: '2-digit' 
+          });
+          
+          const iconColor = notification.isRead ? 'text-gray-400' : 'text-yellow-500';
+          const bgColor = notification.isRead ? 'bg-gray-50' : 'bg-yellow-50';
+          const fontWeight = notification.isRead ? 'font-normal' : 'font-semibold';
+          
+          return `
+            <div class="${bgColor} p-3 rounded-lg hover:shadow-sm transition-shadow cursor-pointer" onclick="app.handleNotificationClick('${notification._id}')">
+              <div class="flex items-start gap-3">
+                <svg class="w-5 h-5 ${iconColor} flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"></path>
+                </svg>
+                <div class="flex-1 min-w-0">
+                  <p class="${fontWeight} text-sm text-gray-900">${notification.title}</p>
+                  <p class="text-xs text-gray-600 mt-1 line-clamp-2">${notification.message}</p>
+                  <p class="text-xs text-gray-500 mt-1">${timeString}</p>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } else {
+        notificationsList.innerHTML = `
+          <div class="text-center py-8">
+            <svg class="w-16 h-16 mx-auto text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+            </svg>
+            <p class="text-sm text-slate-500">No notifications yet</p>
+          </div>
+        `;
+      }
+    } catch (error) {
+      console.error('Failed to load notifications:', error);
+    }
+  }
+  
+  async handleNotificationClick(notificationId) {
+    try {
+      // Mark as read
+      await api.markNotificationAsRead(notificationId);
+      
+      // Reload notifications
+      this.loadRecentNotifications();
+      
+      // Update badge in header
+      const badge = document.getElementById('unread-count');
+      const response = await api.getNotifications({ unreadOnly: 'true' });
+      if (badge && response.unreadCount > 0) {
+        badge.textContent = response.unreadCount;
+        badge.classList.remove('hidden');
+        badge.classList.add('flex');
+      } else if (badge) {
+        badge.classList.add('hidden');
+        badge.classList.remove('flex');
+      }
+    } catch (error) {
+      console.error('Failed to handle notification:', error);
+    }
   }
 
   renderVisitorForm() {
@@ -2479,6 +2583,23 @@ class App {
         } else if (badge) {
           badge.classList.add('hidden');
           badge.classList.remove('flex');
+        }
+        
+        // Update home screen notification count
+        const homeCount = document.getElementById('home-notification-count');
+        if (homeCount) {
+          if (response.unreadCount > 0) {
+            homeCount.textContent = response.unreadCount;
+            homeCount.classList.remove('hidden');
+          } else {
+            homeCount.classList.add('hidden');
+          }
+        }
+        
+        // Refresh home screen notifications list if visible
+        const notificationsList = document.getElementById('recent-notifications-list');
+        if (notificationsList) {
+          await this.loadRecentNotifications();
         }
         
         // Also update visitor requests badge for principals
