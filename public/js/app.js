@@ -3,6 +3,8 @@ class App {
   constructor() {
     this.currentView = null;
     this.notificationInterval = null;
+    this.lastNotificationCount = 0;
+    this.notificationPermissionGranted = false;
     this.init();
   }
 
@@ -34,6 +36,72 @@ class App {
       this.hideLoading();
       this.showToast('Failed to initialize application', 'error');
       this.renderLogin();
+    }
+  }
+
+  async requestNotificationPermission() {
+    // Only request permissions for mobile app
+    if (!window.Capacitor) {
+      return false;
+    }
+
+    try {
+      const { LocalNotifications } = window.Capacitor.Plugins;
+      
+      // Check current permission status
+      const permissionStatus = await LocalNotifications.checkPermissions();
+      console.log('Notification permission status:', permissionStatus);
+      
+      if (permissionStatus.display === 'granted') {
+        this.notificationPermissionGranted = true;
+        return true;
+      }
+      
+      // Request permission if not granted
+      if (permissionStatus.display === 'prompt' || permissionStatus.display === 'prompt-with-rationale') {
+        const result = await LocalNotifications.requestPermissions();
+        console.log('Permission request result:', result);
+        
+        if (result.display === 'granted') {
+          this.notificationPermissionGranted = true;
+          this.showToast('Notifications enabled', 'success');
+          return true;
+        }
+      }
+      
+      return false;
+    } catch (error) {
+      console.error('Error requesting notification permission:', error);
+      return false;
+    }
+  }
+
+  async sendLocalNotification(title, body, id) {
+    if (!this.notificationPermissionGranted || !window.Capacitor) {
+      return;
+    }
+
+    try {
+      const { LocalNotifications } = window.Capacitor.Plugins;
+      
+      await LocalNotifications.schedule({
+        notifications: [
+          {
+            title: title,
+            body: body,
+            id: id || Math.floor(Math.random() * 1000000),
+            schedule: { at: new Date(Date.now() + 1000) }, // 1 second from now
+            sound: undefined,
+            attachments: undefined,
+            actionTypeId: '',
+            extra: null
+          }
+        ]
+      });
+      
+      console.log('Local notification scheduled:', title);
+    } catch (error) {
+      console.error('Error sending local notification:', error);
     }
   }
 
@@ -234,6 +302,12 @@ class App {
         auth.setUser(response.user, response.token);
         console.log('Login successful, token stored');
         this.showToast('Login successful!');
+        
+        // Request notification permissions for principals (mobile only)
+        if (response.user.role === 'principal' && window.Capacitor) {
+          await this.requestNotificationPermission();
+        }
+        
         this.renderDashboard();
         this.startNotificationPolling();
       } catch (error) {
@@ -2703,6 +2777,23 @@ class App {
             homeCount.classList.add('hidden');
           }
         }
+        
+        // Check if new notifications arrived (for background notifications)
+        if (this.notificationPermissionGranted && response.unreadCount > this.lastNotificationCount) {
+          // Get the latest notification details
+          const notifications = response.notifications || [];
+          if (notifications.length > 0) {
+            const latestNotification = notifications[0];
+            await this.sendLocalNotification(
+              latestNotification.title || 'New Notification',
+              latestNotification.message || 'You have a new notification',
+              latestNotification._id ? latestNotification._id.toString() : Math.floor(Math.random() * 1000000)
+            );
+          }
+        }
+        
+        // Update last notification count
+        this.lastNotificationCount = response.unreadCount;
         
         // Refresh home screen notifications list if visible
         const notificationsList = document.getElementById('recent-notifications-list');
