@@ -2868,7 +2868,8 @@ class App {
               latestNotification._id ? latestNotification._id.toString() : Math.floor(Math.random() * 1000000)
             );
           } else {
-            console.log('No notification details available');\n          }
+            console.log('No notification details available');
+          }
         } else {
           if (!this.notificationPermissionGranted) {
             console.log('Notifications disabled or permission not granted');
