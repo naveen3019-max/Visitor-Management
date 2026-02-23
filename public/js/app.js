@@ -42,11 +42,22 @@ class App {
   async requestNotificationPermission() {
     // Only request permissions for mobile app
     if (!window.Capacitor) {
+      console.log('Not a Capacitor app, skipping notification permission');
       return false;
     }
 
     try {
-      const { LocalNotifications } = window.Capacitor.Plugins;
+      console.log('Capacitor detected, checking LocalNotifications plugin...');
+      console.log('Available plugins:', Object.keys(window.Capacitor.Plugins || {}));
+      
+      if (!window.Capacitor.Plugins || !window.Capacitor.Plugins.LocalNotifications) {
+        console.error('LocalNotifications plugin not found!');
+        this.showToast('Notification plugin not available', 'error');
+        return false;
+      }
+      
+      const LocalNotifications = window.Capacitor.Plugins.LocalNotifications;
+      console.log('LocalNotifications plugin loaded');
       
       // Check current permission status
       const permissionStatus = await LocalNotifications.checkPermissions();
@@ -54,35 +65,56 @@ class App {
       
       if (permissionStatus.display === 'granted') {
         this.notificationPermissionGranted = true;
+        console.log('Notification permission already granted');
+        this.showToast('Notifications enabled ✓', 'success');
         return true;
       }
       
       // Request permission if not granted
-      if (permissionStatus.display === 'prompt' || permissionStatus.display === 'prompt-with-rationale') {
-        const result = await LocalNotifications.requestPermissions();
-        console.log('Permission request result:', result);
-        
-        if (result.display === 'granted') {
-          this.notificationPermissionGranted = true;
-          this.showToast('Notifications enabled', 'success');
-          return true;
-        }
+      console.log('Requesting notification permissions...');
+      this.showToast('Requesting notification permission...', 'success');
+      
+      const result = await LocalNotifications.requestPermissions();
+      console.log('Permission request result:', result);
+      
+      if (result.display === 'granted') {
+        this.notificationPermissionGranted = true;
+        this.showToast('✓ Notifications enabled!', 'success');
+        console.log('Notification permission granted!');
+        return true;
+      } else {
+        this.showToast('Notification permission denied', 'error');
+        console.log('Notification permission denied');
       }
       
       return false;
     } catch (error) {
       console.error('Error requesting notification permission:', error);
+      this.showToast('Error requesting notification permission', 'error');
       return false;
     }
   }
 
   async sendLocalNotification(title, body, id) {
-    if (!this.notificationPermissionGranted || !window.Capacitor) {
+    if (!window.Capacitor) {
+      console.log('Not a Capacitor app, cannot send notification');
+      return;
+    }
+    
+    if (!this.notificationPermissionGranted) {
+      console.log('Notification permission not granted, cannot send notification');
       return;
     }
 
     try {
-      const { LocalNotifications } = window.Capacitor.Plugins;
+      if (!window.Capacitor.Plugins || !window.Capacitor.Plugins.LocalNotifications) {
+        console.error('LocalNotifications plugin not available');
+        return;
+      }
+      
+      const LocalNotifications = window.Capacitor.Plugins.LocalNotifications;
+      
+      console.log('Scheduling notification:', title, body);
       
       await LocalNotifications.schedule({
         notifications: [
@@ -99,9 +131,11 @@ class App {
         ]
       });
       
-      console.log('Local notification scheduled:', title);
+      console.log('✓ Local notification scheduled successfully:', title);
+      this.showToast('📢 Notification sent!', 'success');
     } catch (error) {
       console.error('Error sending local notification:', error);
+      this.showToast('Error sending notification', 'error');
     }
   }
 
@@ -304,8 +338,14 @@ class App {
         this.showToast('Login successful!');
         
         // Request notification permissions for principals (mobile only)
-        if (response.user.role === 'principal' && window.Capacitor) {
-          await this.requestNotificationPermission();
+        if (response.user.role === 'principal') {
+          console.log('Principal logged in, requesting notification permission...');
+          if (window.Capacitor) {
+            console.log('Capacitor detected, will request permissions');
+            await this.requestNotificationPermission();
+          } else {
+            console.log('Not a mobile app, skipping notification permission');
+          }
         }
         
         this.renderDashboard();
@@ -1371,13 +1411,18 @@ class App {
                 
                 <!-- Recent Notifications Card -->
                 <div class="bg-white rounded-2xl p-6 shadow-lg">
-                  <h2 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-                    <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-                    </svg>
-                    Recent Notifications
-                    <span id="home-notification-count" class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full hidden"></span>
-                  </h2>
+                  <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                      <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                      </svg>
+                      Recent Notifications
+                      <span id="home-notification-count" class="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full hidden"></span>
+                    </h2>
+                    <button id="test-notification-btn" class="px-3 py-1 text-xs bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold transition-colors">
+                      Test 🔔
+                    </button>
+                  </div>
                   <div class="space-y-3" id="recent-notifications-list">
                     <div class="flex items-center justify-center py-8">
                       <div class="animate-spin rounded-full h-8 w-8 border-4 border-gray-200 border-t-indigo-600"></div>
@@ -1432,6 +1477,33 @@ class App {
     document.getElementById('visitor-requests-btn').addEventListener('click', () => this.renderVisitorRequests());
     document.getElementById('analytics-btn').addEventListener('click', () => this.renderAnalytics());
     document.getElementById('reports-btn').addEventListener('click', () => this.renderReports());
+    
+    // Test notification button
+    const testNotificationBtn = document.getElementById('test-notification-btn');
+    if (testNotificationBtn) {
+      testNotificationBtn.addEventListener('click', async () => {
+        console.log('Test notification button clicked');
+        if (!window.Capacitor) {
+          this.showToast('Notifications only work in mobile app', 'error');
+          return;
+        }
+        
+        if (!this.notificationPermissionGranted) {
+          this.showToast('Requesting notification permission...', 'success');
+          const granted = await this.requestNotificationPermission();
+          if (!granted) {
+            this.showToast('Please enable notifications in settings', 'error');
+            return;
+          }
+        }
+        
+        await this.sendLocalNotification(
+          'Test Notification 🔔',
+          'This is a test notification from Visitor Management',
+          Date.now()
+        );
+      });
+    }
     
     // Notification button
     document.querySelector('#notification-badge button').addEventListener('click', () => this.renderNotifications());
@@ -2779,16 +2851,29 @@ class App {
         }
         
         // Check if new notifications arrived (for background notifications)
+        console.log('Checking for new notifications...');
+        console.log('Permission granted:', this.notificationPermissionGranted);
+        console.log('Current count:', response.unreadCount, 'Last count:', this.lastNotificationCount);
+        
         if (this.notificationPermissionGranted && response.unreadCount > this.lastNotificationCount) {
+          console.log('\u2713 New notifications detected! Sending local notification...');
           // Get the latest notification details
           const notifications = response.notifications || [];
           if (notifications.length > 0) {
             const latestNotification = notifications[0];
+            console.log('Latest notification:', latestNotification);
             await this.sendLocalNotification(
               latestNotification.title || 'New Notification',
               latestNotification.message || 'You have a new notification',
               latestNotification._id ? latestNotification._id.toString() : Math.floor(Math.random() * 1000000)
             );
+          } else {
+            console.log('No notification details available');\n          }
+        } else {
+          if (!this.notificationPermissionGranted) {
+            console.log('Notifications disabled or permission not granted');
+          } else if (response.unreadCount <= this.lastNotificationCount) {
+            console.log('No new notifications (count unchanged or decreased)');
           }
         }
         
