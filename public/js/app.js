@@ -4,6 +4,8 @@ class App {
     this.currentView = null;
     this.notificationInterval = null;
     this.lastNotificationCount = 0;
+    this.lastSeenNotificationId = null;
+    this.notificationBaselineReady = false;
     this.notificationPermissionGranted = false;
     this.init();
   }
@@ -2881,10 +2883,21 @@ class App {
   }
 
   startNotificationPolling() {
+    if (this.notificationInterval) {
+      clearInterval(this.notificationInterval);
+      this.notificationInterval = null;
+    }
+
     // Fetch notifications immediately on start
     const fetchNotifications = async () => {
       try {
-        const response = await api.getNotifications({ unreadOnly: 'true' });
+        const currentUser = auth.getUser();
+
+        if (window.Capacitor && currentUser?.role === 'principal' && !this.notificationPermissionGranted) {
+          await this.requestNotificationPermission();
+        }
+
+        const response = await api.getNotifications({ unreadOnly: 'true', limit: 5 });
         const badge = document.getElementById('unread-count');
         if (badge && response.unreadCount > 0) {
           badge.textContent = response.unreadCount;
@@ -2907,31 +2920,34 @@ class App {
         }
         
         // Check if new notifications arrived (for background notifications)
+        const notifications = response.notifications || [];
+        const latestNotification = notifications[0] || null;
+        const latestNotificationId = latestNotification?._id ? String(latestNotification._id) : null;
+
         console.log('Checking for new notifications...');
         console.log('Permission granted:', this.notificationPermissionGranted);
         console.log('Current count:', response.unreadCount, 'Last count:', this.lastNotificationCount);
-        
-        if (this.notificationPermissionGranted && response.unreadCount > this.lastNotificationCount) {
-          console.log('\u2713 New notifications detected! Sending local notification...');
-          // Get the latest notification details
-          const notifications = response.notifications || [];
-          if (notifications.length > 0) {
-            const latestNotification = notifications[0];
-            console.log('Latest notification:', latestNotification);
-            await this.sendLocalNotification(
-              latestNotification.title || 'New Notification',
-              latestNotification.message || 'You have a new notification',
-              latestNotification._id || Date.now()
-            );
-          } else {
-            console.log('No notification details available');
-          }
+        console.log('Latest ID:', latestNotificationId, 'Last seen ID:', this.lastSeenNotificationId);
+
+        if (!this.notificationBaselineReady) {
+          this.lastSeenNotificationId = latestNotificationId;
+          this.notificationBaselineReady = true;
+          console.log('Notification baseline initialized');
+        } else if (this.notificationPermissionGranted && latestNotificationId && latestNotificationId !== this.lastSeenNotificationId) {
+          console.log('\u2713 New notification ID detected! Sending local notification...');
+          await this.sendLocalNotification(
+            latestNotification.title || 'New Notification',
+            latestNotification.message || 'You have a new notification',
+            latestNotification._id || Date.now()
+          );
+          this.lastSeenNotificationId = latestNotificationId;
         } else {
           if (!this.notificationPermissionGranted) {
             console.log('Notifications disabled or permission not granted');
-          } else if (response.unreadCount <= this.lastNotificationCount) {
-            console.log('No new notifications (count unchanged or decreased)');
+          } else {
+            console.log('No new notification ID detected');
           }
+          this.lastSeenNotificationId = latestNotificationId;
         }
         
         // Update last notification count
@@ -2944,7 +2960,7 @@ class App {
         }
         
         // Also update visitor requests badge for principals
-        if (this.user && this.user.role === 'principal') {
+        if (currentUser?.role === 'principal') {
           await this.updatePendingBadge();
         }
       } catch (error) {
@@ -2955,8 +2971,8 @@ class App {
     // Fetch immediately
     fetchNotifications();
 
-    // Then poll every 30 seconds
-    this.notificationInterval = setInterval(fetchNotifications, 30000);
+    // Then poll every 10 seconds for faster delivery
+    this.notificationInterval = setInterval(fetchNotifications, 10000);
   }
 
   stopNotificationPolling() {
