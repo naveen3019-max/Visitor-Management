@@ -79,6 +79,7 @@ class App {
       
       if (result.display === 'granted') {
         this.notificationPermissionGranted = true;
+        await this.ensureNotificationChannel();
         this.showToast('✓ Notifications enabled!', 'success');
         console.log('Notification permission granted!');
         return true;
@@ -95,17 +96,48 @@ class App {
     }
   }
 
+  getSafeNotificationId(seed) {
+    const max = 2147483647;
+    if (typeof seed === 'number' && Number.isFinite(seed)) {
+      return Math.max(1, Math.floor(Math.abs(seed) % max));
+    }
+
+    const parsedNumber = parseInt(String(seed || ''), 10);
+    if (Number.isFinite(parsedNumber)) {
+      return Math.max(1, Math.floor(Math.abs(parsedNumber) % max));
+    }
+
+    return Math.max(1, Math.floor(Date.now() % max));
+  }
+
+  async ensureNotificationChannel() {
+    try {
+      const LocalNotifications = window.Capacitor?.Plugins?.LocalNotifications;
+      if (!LocalNotifications) {
+        return false;
+      }
+
+      await LocalNotifications.createChannel({
+        id: 'visitor_alerts',
+        name: 'Visitor Alerts',
+        description: 'New visitor entry notifications',
+        importance: 5,
+        visibility: 1
+      });
+
+      return true;
+    } catch (error) {
+      console.log('Notification channel setup skipped/failed:', error);
+      return false;
+    }
+  }
+
   async sendLocalNotification(title, body, id) {
     if (!window.Capacitor) {
       console.log('Not a Capacitor app, cannot send notification');
       return;
     }
     
-    if (!this.notificationPermissionGranted) {
-      console.log('Notification permission not granted, cannot send notification');
-      return;
-    }
-
     try {
       if (!window.Capacitor.Plugins || !window.Capacitor.Plugins.LocalNotifications) {
         console.error('LocalNotifications plugin not available');
@@ -113,10 +145,21 @@ class App {
       }
       
       const LocalNotifications = window.Capacitor.Plugins.LocalNotifications;
-      
-      const normalizedId = Number.isInteger(id)
-        ? id
-        : Math.abs(String(id || Date.now()).split('').reduce((acc, char) => ((acc * 31) + char.charCodeAt(0)) | 0, 0));
+
+      const permissionStatus = await LocalNotifications.checkPermissions();
+      if (permissionStatus.display !== 'granted') {
+        const requested = await LocalNotifications.requestPermissions();
+        if (requested.display !== 'granted') {
+          this.notificationPermissionGranted = false;
+          this.showToast('Notification permission denied', 'error');
+          return;
+        }
+      }
+      this.notificationPermissionGranted = true;
+
+      await this.ensureNotificationChannel();
+
+      const normalizedId = this.getSafeNotificationId(id);
 
       console.log('Scheduling notification:', title, body, 'id:', normalizedId);
 
@@ -126,6 +169,7 @@ class App {
             id: normalizedId,
             title: title,
             body: body,
+            channelId: 'visitor_alerts',
             schedule: { at: new Date(Date.now() + 1500) }
           }
         ]
