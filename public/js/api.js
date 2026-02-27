@@ -174,6 +174,11 @@ class API {
     });
   }
 
+  // Alias for backwards compatibility
+  async markNotificationAsRead(id) {
+    return this.markNotificationRead(id);
+  }
+
   async markAllNotificationsRead() {
     return this.request('/notifications/read-all', {
       method: 'PUT'

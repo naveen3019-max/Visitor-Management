@@ -1714,13 +1714,25 @@ class App {
       }
     } catch (error) {
       console.error('Failed to load notifications:', error);
+      const notificationsList = document.getElementById('recent-notifications-list');
+      if (notificationsList) {
+        notificationsList.innerHTML = `
+          <div class="text-center py-8">
+            <svg class="w-16 h-16 mx-auto text-red-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <p class="text-sm text-red-600 font-semibold">Failed to load notifications</p>
+            <p class="text-xs text-gray-500 mt-1">${error.message || 'Please try again'}</p>
+          </div>
+        `;
+      }
     }
   }
   
   async handleNotificationClick(notificationId) {
     try {
       // Mark as read
-      await api.markNotificationAsRead(notificationId);
+      await api.markNotificationRead(notificationId);
       
       // Reload notifications
       this.loadRecentNotifications();
