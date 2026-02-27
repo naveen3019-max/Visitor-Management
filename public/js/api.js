@@ -225,17 +225,34 @@ class API {
 
   // Reports
   async generatePDFReport(filters) {
+    const token = localStorage.getItem('authToken');
     const response = await fetch(`${this.baseURL}/reports/pdf`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
       },
       credentials: 'include',
       body: JSON.stringify(filters)
     });
 
     if (!response.ok) {
-      throw new Error('Failed to generate PDF');
+      let errorMessage = 'Failed to generate PDF';
+      try {
+        const errorData = await response.json();
+        if (errorData?.message) {
+          errorMessage = errorData.message;
+        }
+      } catch (e) {
+        // Ignore JSON parse errors and keep default message
+      }
+      throw new Error(errorMessage);
+    }
+
+    const contentType = response.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      const data = await response.json();
+      throw new Error(data?.message || 'Failed to generate PDF');
     }
 
     const blob = await response.blob();
@@ -250,17 +267,34 @@ class API {
   }
 
   async generateCSVReport(filters) {
+    const token = localStorage.getItem('authToken');
     const response = await fetch(`${this.baseURL}/reports/csv`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
       },
       credentials: 'include',
       body: JSON.stringify(filters)
     });
 
     if (!response.ok) {
-      throw new Error('Failed to generate CSV');
+      let errorMessage = 'Failed to generate CSV';
+      try {
+        const errorData = await response.json();
+        if (errorData?.message) {
+          errorMessage = errorData.message;
+        }
+      } catch (e) {
+        // Ignore JSON parse errors and keep default message
+      }
+      throw new Error(errorMessage);
+    }
+
+    const contentType = response.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      const data = await response.json();
+      throw new Error(data?.message || 'Failed to generate CSV');
     }
 
     const blob = await response.blob();
