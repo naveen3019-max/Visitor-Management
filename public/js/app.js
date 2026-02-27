@@ -114,19 +114,19 @@ class App {
       
       const LocalNotifications = window.Capacitor.Plugins.LocalNotifications;
       
-      console.log('Scheduling notification:', title, body);
-      
+      const normalizedId = Number.isInteger(id)
+        ? id
+        : Math.abs(String(id || Date.now()).split('').reduce((acc, char) => ((acc * 31) + char.charCodeAt(0)) | 0, 0));
+
+      console.log('Scheduling notification:', title, body, 'id:', normalizedId);
+
       await LocalNotifications.schedule({
         notifications: [
           {
+            id: normalizedId,
             title: title,
             body: body,
-            id: id || Math.floor(Math.random() * 1000000),
-            schedule: { at: new Date(Date.now() + 1000) }, // 1 second from now
-            sound: undefined,
-            attachments: undefined,
-            actionTypeId: '',
-            extra: null
+            schedule: { at: new Date(Date.now() + 1500) }
           }
         ]
       });
@@ -135,7 +135,7 @@ class App {
       this.showToast('📢 Notification sent!', 'success');
     } catch (error) {
       console.error('Error sending local notification:', error);
-      this.showToast('Error sending notification', 'error');
+      this.showToast(`Error sending notification: ${error?.message || 'Unknown error'}`, 'error');
     }
   }
 
@@ -2877,7 +2877,7 @@ class App {
             await this.sendLocalNotification(
               latestNotification.title || 'New Notification',
               latestNotification.message || 'You have a new notification',
-              latestNotification._id ? latestNotification._id.toString() : Math.floor(Math.random() * 1000000)
+              latestNotification._id || Date.now()
             );
           } else {
             console.log('No notification details available');
